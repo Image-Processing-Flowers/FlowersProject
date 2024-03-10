@@ -9,7 +9,7 @@
 
 using namespace std;
 
-#define path "..\\flower_images";
+#define path "E:\\Scoala\\Facultate\\An 3\\PI\\flower_images";
 
 void openImagesBatch()
 {
@@ -56,10 +56,12 @@ void openImagesBatch()
 		++it;
 	}*/
 
+
 }
 
 int main() 
 {
+	// TEST BRANCH
 	openImagesBatch();
 
 	return 0;
