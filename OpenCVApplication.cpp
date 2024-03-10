@@ -5,9 +5,8 @@
 #include "common.h"
 #include <opencv2/core/utils/logger.hpp>
 #include <string>
-#include <filesystem>
 
-#define path "E:\\Scoala\\Facultate\\An 3\\PI\\flower_images"
+#define path "E:\\Scoala\\Facultate\\An 3\\PI\\flower_images";
 
 void openImagesBatch()
 {
@@ -20,24 +19,24 @@ void openImagesBatch()
 	{
 		std::string currentFolderPath = folderPath + "\\" + flowerFolder;
 
-		for (const auto& entry : std::filesystem::directory_iterator(currentFolderPath))
+		// Use OpenCV's glob function to find files matching the pattern
+		std::vector<cv::String> imageFiles;
+		cv::glob(currentFolderPath + "\\*.jpg", imageFiles, false);
+
+		// Iterate through the found files
+		for (const auto& imagePath : imageFiles)
 		{
-			// Check if the entry is a regular file
-			if (entry.is_regular_file())
+			cv::Mat src = cv::imread(imagePath);
+
+			if (!src.data)
 			{
-				std::string imagePath = entry.path().string();
-
-				cv::Mat src = cv::imread(imagePath);
-
-				if (!src.data)
-				{
-					std::cerr << "Error loading image: " << imagePath << std::endl;
-					continue;
-				}
-
-				imshow("image", src);
-				waitKey();
+				std::cerr << "Error loading image: " << imagePath << std::endl;
+				continue;
 			}
+
+			imshow("image", src);
+			waitKey();
+		}
 	}
 }
 
