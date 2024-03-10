@@ -9,7 +9,7 @@
 
 using namespace std;
 
-#define path "E:\\Scoala\\Facultate\\An 3\\PI\\flower_images";
+#define path "..\\flower_images";
 
 void openImagesBatch()
 {
@@ -60,8 +60,27 @@ void openImagesBatch()
 
 int main() 
 {
-
 	openImagesBatch();
 
 	return 0;
 }
+
+//#include <array>
+//#include <iostream>
+//#ifdef _WIN32
+//#include <windows.h>
+//#else
+//#include <unistd.h>
+//#endif
+
+//std::string GetComputerName() {
+//	std::array<char, MAX_COMPUTERNAME_LENGTH + 1> computerName{};
+//	DWORD size = computerName.size();
+//	if (GetComputerNameA(computerName.data(), &size)) {
+//		return std::string(computerName.data(), size);
+//	}
+//	return "Unknown";
+//}
+//int main() {
+//	cout << GetComputerName();
+//}
