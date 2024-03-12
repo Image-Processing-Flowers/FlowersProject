@@ -9,18 +9,17 @@
 
 using namespace std;
 
-#define path "E:\\Scoala\\Facultate\\An 3\\PI\\flower_images";
+#define path "C:\\Users\\DELL\\Desktop\\skull\\3\\PI\\project\\flower_images";
 
-void openImagesBatch()
+vector<String> openImagesBatch(map<String, int>& flowersMap)
 {
+	//this method opens the image batch, tags the types and returns all the path to all flower photos
 	std::string folderPath = path;
 
 	// Array of flower folder names
 	// 0 - Lilly, 1 - Lotus, 2 - Orchid, 3 - Sunflower, 4 - Tulip
-	std::string flowerFolders[] = {"Lilly", "Lotus", "Orchid", "Sunflower", "Tulip"};
-	std::vector<cv::String> train;
-	std::vector<cv::String> test;
-	map<String, int> flowersMap;
+	std::string flowerFolders[] = { "Lilly", "Lotus", "Orchid", "Sunflower", "Tulip" };
+	vector<String> imagePaths;
 	int i = 0;
 	for (const auto& flowerFolder : flowerFolders)
 	{
@@ -35,35 +34,41 @@ void openImagesBatch()
 		for (const auto& imagePath : imageFiles)
 		{
 			flowersMap.insert(pair<String, int>(imagePath, i));
-			cv::Mat src = cv::imread(imagePath);
+			imagePaths.push_back(imagePath);
+			/*cv::Mat src = cv::imread(imagePath);
 			if (counter == 0)
 				train.push_back(imagePath);
-			else 
+			else
 				test.push_back(imagePath);
 			if (!src.data)
 			{
 				std::cerr << "Error loading image: " << imagePath << std::endl;
 				continue;
 			}
-			counter = 1 - counter;
+			counter = 1 - counter;*/
 		}
 		i++;
 	}
-	/*map<string, int>::iterator it = flowersMap.begin();
-	while (it != flowersMap.end()) {
-		cout << "Key: " << it->first
-			<< ", Value: " << it->second << endl;
-		++it;
-	}*/
-
+	sort(imagePaths.begin(), imagePaths.end());
+	return imagePaths;
+}
+void assignTrainTest(vector<String>& train, vector<String>& test) {
 
 }
 
-int main() 
+int main()
 {
-	// TEST BRANCH
-	openImagesBatch();
-
+	map<String, int> flowersMap;
+	vector<String> imagePaths;
+	imagePaths = openImagesBatch(flowersMap);
+	for (const auto& elem : imagePaths)
+	{
+		cout << elem << endl;
+	}
+	for (const auto& elem : flowersMap)
+	{
+		cout << elem.first << " " << elem.second << endl;
+	}
 	return 0;
 }
 
