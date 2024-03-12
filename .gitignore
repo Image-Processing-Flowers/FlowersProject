@@ -1,2 +1,5 @@
 /OpenCV/dll/
 /x64/
+bin/
+.vs/
+obj/
