@@ -359,5 +359,9 @@ MigrationBackup/
 /stdafx.cpp
 /stdafx.h
 /targetver.h
+<<<<<<< HEAD
 /Videos
 .vs/
+=======
+/Videos
+>>>>>>> 1d63f0e7b48d3294cb672740ee02df98e3887225
