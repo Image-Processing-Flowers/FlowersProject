@@ -22,6 +22,7 @@ String GetComputerName() {
 
 	array<char, MAX_COMPUTERNAME_LENGTH + 1> computerName{};
 	DWORD size = computerName.size();
+
 	if (GetComputerNameA(computerName.data(), &size)) {
 		return String(computerName.data(), size);
 	}
