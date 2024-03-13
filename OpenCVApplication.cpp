@@ -1,11 +1,6 @@
 // OpenCVApplication.cpp : Defines the entry point for the console application.
 //
 
-// De modificat:
-// Functia sa returneze lista cu poze, functii noi: functie de separat cele 2 seturi train si test;
-// functie care sa genereze etichetele, functie care sa stabileasca path-ul in functie de cine ruleaza codul.
-// Test la fiecare functie. Functia care creaza lista de imagini trebuie sortata.
-
 #include "stdafx.h"
 #include "common.h"
 #include <opencv2/core/utils/logger.hpp>
@@ -45,27 +40,30 @@ void openImagesBatch()
 				train.push_back(imagePath);
 			else 
 				test.push_back(imagePath);
+			if (!src.data)
+			{
+				std::cerr << "Error loading image: " << imagePath << std::endl;
+				continue;
+			}
 			counter = 1 - counter;
 		}
 		i++;
 	}
-	for (const auto& imagePath : train)
-		cout << "Train: " << imagePath << endl;
-	for (const auto& imagePath : test)
-		cout << "Test: " << imagePath << endl;
-	map<string, int>::iterator it = flowersMap.begin();
+	/*map<string, int>::iterator it = flowersMap.begin();
 	while (it != flowersMap.end()) {
 		cout << "Key: " << it->first
 			<< ", Value: " << it->second << endl;
 		++it;
-	}
+	}*/
 
 
 }
 
 int main() 
 {
+	// TEST BRANCH
 	openImagesBatch();
+
 	return 0;
 }
 
