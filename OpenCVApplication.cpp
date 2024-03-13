@@ -1,78 +1,45 @@
 // OpenCVApplication.cpp : Defines the entry point for the console application.
 //
-<<<<<<< HEAD
 
 // De modificat:
 // Functia sa returneze lista cu poze, functii noi: functie de separat cele 2 seturi train si test;
 // functie care sa genereze etichetele, functie care sa stabileasca path-ul in functie de cine ruleaza codul.
 // Test la fiecare functie. Functia care creaza lista de imagini trebuie sortata.
 
-=======
-//
->>>>>>> 1d63f0e7b48d3294cb672740ee02df98e3887225
 #include "stdafx.h"
 #include "common.h"
 #include <opencv2/core/utils/logger.hpp>
 #include <string>
 #include <iostream>
-#include "stdafx.h"
-#include <array>
-#ifdef _WIN32
-#include <windows.h>
-#else
-#include <unistd.h>
-#endif
 
 using namespace std;
 
-String path = "Not initialized!";
+#define path "E:\\Scoala\\Facultate\\An 3\\PI\\flower_images";
 
-String GetComputerName() {
-
-	array<char, MAX_COMPUTERNAME_LENGTH + 1> computerName{};
-	DWORD size = computerName.size();
-	if (GetComputerNameA(computerName.data(), &size)) {
-		return String(computerName.data(), size);
-	}
-	return "Unknown";
-}
-
-void AssignPath() {
-
-	String pcName = GetComputerName();
-
-	//Vlad
-	if (pcName == "DESKTOP-0RHH391") {
-		path = "C:\\Users\\DELL\\Desktop\\skull\\3\\PI\\project\\flower_images";
-	}
-	//Ivan
-
-	//Istrate
-
-	//Serju
-
-}
-
-void OpenImagesBatch(vector<String>& imagePaths, map<String, int>& flowersMap) {
-	//this method opens the image batch, tags the types and returns all the path to all flower photos
-	String folderPath = path;
+void openImagesBatch()
+{
+	std::string folderPath = path;
 
 	// Array of flower folder names
 	// 0 - Lilly, 1 - Lotus, 2 - Orchid, 3 - Sunflower, 4 - Tulip
-	String flowerFolders[] = { "Lilly", "Lotus", "Orchid", "Sunflower", "Tulip" };
+	std::string flowerFolders[] = {"Lilly", "Lotus", "Orchid", "Sunflower", "Tulip"};
+	std::vector<cv::String> train;
+	std::vector<cv::String> test;
+	map<String, int> flowersMap;
 	int i = 0;
-
 	for (const auto& flowerFolder : flowerFolders)
 	{
-		String currentFolderPath = folderPath + "\\" + flowerFolder;
+		std::string currentFolderPath = folderPath + "\\" + flowerFolder;
 
-		vector<String> imageFiles;
+		// Use OpenCV's glob function to find files matching the pattern
+		std::vector<cv::String> imageFiles;
 		cv::glob(currentFolderPath + "\\*.jpg", imageFiles, false);
 
+		// Iterate through the found files
+		int counter = 0;
 		for (const auto& imagePath : imageFiles)
 		{
 			flowersMap.insert(pair<String, int>(imagePath, i));
-<<<<<<< HEAD
 			cv::Mat src = cv::imread(imagePath);
 			if (counter == 0)
 				train.push_back(imagePath);
@@ -92,62 +59,33 @@ void OpenImagesBatch(vector<String>& imagePaths, map<String, int>& flowersMap) {
 			<< ", Value: " << it->second << endl;
 		++it;
 	}
-=======
-			imagePaths.push_back(imagePath);
-		}
-		i++;
-	}
->>>>>>> 1d63f0e7b48d3294cb672740ee02df98e3887225
 
-	sort(imagePaths.begin(), imagePaths.end());
-}
-void AssignTrainTest(vector<String> imagePaths, vector<String>& train, vector<String>& test) {
 
-	bool toggle = true;
-	for (const auto& elem : imagePaths) {
-
-		if (toggle == true) {
-			train.push_back(elem);
-		}
-		else
-			test.push_back(elem);
-		toggle = !toggle;
-	}
 }
 
-int main()
+int main() 
 {
-<<<<<<< HEAD
 	openImagesBatch();
-=======
-	AssignPath();
-
-	map<String, int> flowersMap;
-	vector<String> imagePaths;
-	vector<String> test;
-	vector<String> train;
-
-	OpenImagesBatch(imagePaths, flowersMap);
-	AssignTrainTest(imagePaths, train, test);
-
-
-	//results printing
-	for (const auto& elem : imagePaths)
-	{
-		cout << elem << endl;
-	}
-	for (const auto& elem : flowersMap)
-	{
-		cout << elem.first << " " << elem.second << endl;
-	}
-	for (const auto& elem : train) {
-		cout << elem << "    ->train" << endl;
-	}
-	for (const auto& elem : test) {
-		cout << elem << "    ->test" << endl;
-	}
-	cout << imagePaths.size() << endl;
-
->>>>>>> 1d63f0e7b48d3294cb672740ee02df98e3887225
 	return 0;
 }
+
+
+//#include <array>
+//#include <iostream>
+//#ifdef _WIN32
+//#include <windows.h>
+//#else
+//#include <unistd.h>
+//#endif
+
+//std::string GetComputerName() {
+//	std::array<char, MAX_COMPUTERNAME_LENGTH + 1> computerName{};
+//	DWORD size = computerName.size();
+//	if (GetComputerNameA(computerName.data(), &size)) {
+//		return std::string(computerName.data(), size);
+//	}
+//	return "Unknown";
+//}
+//int main() {
+//	cout << GetComputerName();
+//}
