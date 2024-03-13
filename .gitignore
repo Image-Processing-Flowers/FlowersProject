@@ -362,8 +362,3 @@ MigrationBackup/
 /targetver.h
 /Videos
 .vs/
-=======
-/OpenCV/dll/
-/x64/
-/vs
->>>>>>> parent of a695f92 (aaa)
