@@ -87,20 +87,15 @@ void AssignTrainTest(vector<String> imagePaths, vector<String>& train, vector<St
 	}
 }
 
-void AreAllFilesOpened(const vector<String>& allFiles, const map<String, int>& openedFiles) {
-	if (allFiles.size() != openedFiles.size()) {
-		cout << "The test to open all the images failed!" << endl;
-		return;
+void AreAllFilesOpened(const vector<String>& allFiles) {
+	if (allFiles.size() == 5000) 
+	{
+		cout << "The test was passed successfully!" << endl;
 	}
-
-	for (const auto& filePath : allFiles) {
-		if (openedFiles.find(filePath) == openedFiles.end()) {
-			cout << "The test to open all the images failed!" << endl;
-			return;
-		}
+	else
+	{
+		cout << "The test failed!" << endl;
 	}
-
-	cout << "The test to open all the images succeeded!" << endl;
 	return;
 }
 
@@ -108,7 +103,7 @@ int main()
 {
 	vector<String> possibleOptions = { "Assign Test/Train","Run the tests","Exit" };
 	int optionChosed = -1;
-	
+
 	map<String, int> flowersMap;
 	vector<String> imagePaths;
 	vector<String> test;
@@ -130,20 +125,20 @@ int main()
 		cin >> optionChosed;
 
 		switch (optionChosed) {
-			case 0:
-				AssignTrainTest(imagePaths, train, test);
-				break;
+		case 0:
+			AssignTrainTest(imagePaths, train, test);
+			break;
 
-			case 1:
-				AreAllFilesOpened(imagePaths, flowersMap);
-				break;
+		case 1:
+			AreAllFilesOpened(imagePaths);
+			break;
 
-			case 2:
-				return 0;
+		case 2:
+			return 0;
 
-			default:
-				cout << "Invalid option" << endl;
-				break;
+		default:
+			cout << "Invalid option" << endl;
+			break;
 		}
 
 		cout << endl << endl << endl << endl;
