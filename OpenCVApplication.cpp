@@ -43,7 +43,6 @@ void AssignPath() {
 	if (pcName == "ANDREI-PC") {
 		path = "E:\\Scoala\\Facultate\\An 3\\PI\\flower_images";
 	}
-
 	//Serju
 
 }
