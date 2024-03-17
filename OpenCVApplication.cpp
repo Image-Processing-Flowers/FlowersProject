@@ -43,6 +43,7 @@ void AssignPath() {
 	if (pcName == "ANDREI-PC") {
 		path = "E:\\Scoala\\Facultate\\An 3\\PI\\flower_images";
 	}
+
 	//Serju
 
 }
@@ -75,6 +76,7 @@ void OpenImagesBatch(vector<String>& imagePaths, map<String, int>& flowersMap) {
 		imagePaths.insert(imagePaths.end(), auxPaths.begin(), auxPaths.end());
 
 	}
+
 
 }
 void AssignTrainTest(vector<String> imagePaths, vector<String>& train, vector<String>& test) {
