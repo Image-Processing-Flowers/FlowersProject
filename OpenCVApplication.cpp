@@ -61,18 +61,22 @@ void OpenImagesBatch(vector<String>& imagePaths, map<String, int>& flowersMap) {
 	{
 		String currentFolderPath = folderPath + "\\" + flowerFolder;
 
+		vector<String> auxPaths;
 		vector<String> imageFiles;
 		cv::glob(currentFolderPath + "\\*.jpg", imageFiles, false);
 
 		for (const auto& imagePath : imageFiles)
 		{
 			flowersMap.insert(pair<String, int>(imagePath, i));
-			imagePaths.push_back(imagePath);
+			auxPaths.push_back(imagePath);
 		}
+
 		i++;
+		sort(auxPaths.begin(), auxPaths.end());
+		imagePaths.insert(imagePaths.end(), auxPaths.begin(), auxPaths.end());
+
 	}
 
-	sort(imagePaths.begin(), imagePaths.end());
 }
 void AssignTrainTest(vector<String> imagePaths, vector<String>& train, vector<String>& test) {
 
