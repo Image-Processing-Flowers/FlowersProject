@@ -39,6 +39,10 @@ void AssignPath() {
 	}
 	//Ivan
 
+	if (pcName == "DESKTOP-F7R1VR7") {
+		path = "C:\\An 3 Sem 2\\PI\\flower_images";
+	}
+
 	//Istrate
 	if (pcName == "ANDREI-PC") {
 		path = "E:\\Scoala\\Facultate\\An 3\\PI\\flower_images";
