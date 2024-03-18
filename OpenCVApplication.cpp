@@ -37,8 +37,8 @@ void AssignPath() {
 	if (pcName == "DESKTOP-0RHH391") {
 		path = "C:\\Users\\DELL\\Desktop\\skull\\3\\PI\\project\\flower_images";
 	}
-	//Ivan
 
+	//Ivan
 	if (pcName == "DESKTOP-F7R1VR7") {
 		path = "C:\\An 3 Sem 2\\PI\\flower_images";
 	}
@@ -49,6 +49,9 @@ void AssignPath() {
 	}
 
 	//Serju
+	if (pcName == "DESKTOP-MML3IRG") {
+		path = "C:\\Users\\Sergiu\\Documents\\Faculta Stuff\\Procesarea Imaginilor\\flower_images";
+	}
 
 }
 
