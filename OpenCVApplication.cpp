@@ -30,7 +30,7 @@ String GetComputerName() {
 	return "Unknown";
 }
 
-void AssignPath() {
+void assignPath() {
 
 	String pcName = GetComputerName();
 
@@ -56,7 +56,7 @@ void AssignPath() {
 
 }
 
-void OpenImagesBatch(vector<String>& imagePaths, map<String, int>& flowersMap) {
+void openImagesBatch(vector<String>& imagePaths, map<String, int>& flowersMap) {
 	//this method opens the image batch, tags the types and returns all the path to all flower photos
 	String folderPath = path;
 
@@ -87,7 +87,7 @@ void OpenImagesBatch(vector<String>& imagePaths, map<String, int>& flowersMap) {
 
 
 }
-void AssignTrainTest(vector<String> imagePaths, vector<String>& train, vector<String>& test) {
+void assignTrainTest(vector<String> imagePaths, vector<String>& train, vector<String>& test) {
 
 	bool toggle = true;
 	if(train.size() == 0 && test.size() == 0)
@@ -105,7 +105,7 @@ void AssignTrainTest(vector<String> imagePaths, vector<String>& train, vector<St
 	cout << "No. elements assigned to train: " << train.size() << endl;
 }
 
-void AreAllFilesOpened(const vector<String>& allFiles) {
+void areAllFilesOpened(const vector<String>& allFiles) {
 
 	cout << "Files opened: " << allFiles.size() << endl;
 	if (allFiles.size() == 5000)
@@ -211,8 +211,8 @@ int main()
 
 	float accuracy;
 
-	AssignPath();
-	OpenImagesBatch(imagePaths, flowersMap);
+	assignPath();
+	openImagesBatch(imagePaths, flowersMap);
 
 	//logic for executing the chosen option
 	//user interface
@@ -230,16 +230,15 @@ int main()
 		// start of options selecion
 		switch (optionChosed) {
 		case 0:
-			AssignTrainTest(imagePaths, train, test);
+			assignTrainTest(imagePaths, train, test);
 			break;
 
 		case 1:
-			AreAllFilesOpened(imagePaths);
+			areAllFilesOpened(imagePaths);
 			break;
 
 		case 2:
 			generateTestTags(test, testMap);
-			// testMap[test[0]] = 7;
 			break;
 
 		case 3:
@@ -258,8 +257,19 @@ int main()
 		}
 
 		cout << " ------------------\n " << endl;
-		system("pause");
-		system("cls");
+
+		#ifdef _WIN32
+			// Windows-specific pause and clear
+			system("pause"); // Pause
+			system("cls");   // Clear screen
+		#else
+			// Portable pause for Unix-like systems
+			std::cout << "Press Enter to continue...";
+			std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+			std::cin.get();
+		// Clear screen
+		system("clear");
+		#endif
 	}
 
 	return 0;
