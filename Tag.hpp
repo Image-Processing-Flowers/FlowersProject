@@ -8,9 +8,8 @@ class Tag
 {
 public:
 
-	/// <summary>
-	///		Returns a number number between 0 and 4
-	/// </summary>
+	
+	// Returns a number number between 0 and 4
 	static int getRandomTag();
 
 };
