@@ -118,7 +118,6 @@ void AreAllFilesOpened(const vector<String>& allFiles) {
 	return;
 }
 
-
 // In the 'testMap' we generate a random number for every element in test
 void generateTestTags(vector<String>& test, map<String, int>& testMap) {
 
@@ -158,7 +157,7 @@ void tagsCorrectRangeTest(map<String, int> testMap) {
 
 	// in case every tag is in the range
 	if (allInRange) {
-		cout << "All elements have correct tags," << endl;
+		cout << "All elements have correct tags." << endl;
 	}
 }
 
@@ -191,6 +190,7 @@ void calculateAccuracy(vector<String> test, map<String, int> flowersMap, map<Str
 
 int main()
 {
+	srand(time(0));	// init for random
 	vector<String> possibleOptions = {
 		"Assign Test/Train",
 		"[TEST] Check number of files opened",
