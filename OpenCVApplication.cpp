@@ -118,12 +118,17 @@ void AreAllFilesOpened(const vector<String>& allFiles) {
 	return;
 }
 
+
+// In the 'testMap' we generate a random number for every element in test
 void generateTestTags(vector<String>& test, map<String, int>& testMap) {
 
+	// in case 'test' have no assigned elements
 	if (test.empty()) {
 		cout << "WARNING: Elements is empty. Firstly, assign elements to test." << endl;
+		return;
 	}
 
+	// generate tags
 	for (const auto& elem : test) {
 
 		int randomTag = Tag::getRandomTag();
@@ -133,34 +138,44 @@ void generateTestTags(vector<String>& test, map<String, int>& testMap) {
 	cout << "Test tags have been generated." << endl;
 }
 
+// Verify if the value(tag) from the 'testMap' is in range 0 to 4
 void tagsCorrectRangeTest(map<String, int> testMap) {
 
+	// in case 'testMap' is not populated
 	if (testMap.empty()) {
 		cout << "ERROR: Test tags aren't generated." << endl;
 	}
 
-	bool inRange = true;
+	// display every element with the unwanted tag number
+	bool allInRange = true;
 	for (const auto& elem : testMap) {
 		if (elem.second < 0 || elem.second > 4) {
-			inRange = false;
+			allInRange = false;
 			cout << "Element {" << elem.first << "}\n\tnot in range [0, 4], with wrong tag {" << elem.second << "}." << endl;
 		}
 
 	}
-	if (inRange) {
+
+	// in case every tag is in the range
+	if (allInRange) {
 		cout << "All elements have correct tags," << endl;
 	}
 }
 
+// Calculate the accuracy
 void calculateAccuracy(vector<String> test, map<String, int> flowersMap, map<String, int> testMap, float& accuracy) {
 	
+	// in case 'test' have no assigned elements
 	if (test.empty()) {
-		cout << "WARNING: Elemtents for test are not assigned." << endl;
+		cout << "WARNING: Elemtents for 'test' are not assigned." << endl;
 	}
+
+	// in case 'testMap' is not populated
 	if (testMap.empty()) {
 		cout << "WARNING: Test tag are not generated." << endl;
 	}
 
+	// increment the 'checks' if the value from 'testMap' match the value from 'flowersMap' for every element from 'test'
 	int checks = 0;
 	for (const auto& elem : test) {
 		if (flowersMap[elem] == testMap[elem]) {
@@ -168,6 +183,8 @@ void calculateAccuracy(vector<String> test, map<String, int> flowersMap, map<Str
 		}
 	}
 
+	// divide the number of 'checks' by the total number of 'test'; 
+	// multiplied by 100 so the value can be read in procentage
 	accuracy = checks / (float)test.size() * 100.0f;
 
 }
@@ -209,6 +226,7 @@ int main()
 		cin >> optionChosed;
 		cout << " ------------------ " << endl;
 
+		// start of options selecion
 		switch (optionChosed) {
 		case 0:
 			AssignTrainTest(imagePaths, train, test);
@@ -220,7 +238,7 @@ int main()
 
 		case 2:
 			generateTestTags(test, testMap);
-			testMap[test[0]] = 7;
+			// testMap[test[0]] = 7;
 			break;
 
 		case 3:
