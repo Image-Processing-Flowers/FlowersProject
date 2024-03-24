@@ -90,15 +90,16 @@ void OpenImagesBatch(vector<String>& imagePaths, map<String, int>& flowersMap) {
 void AssignTrainTest(vector<String> imagePaths, vector<String>& train, vector<String>& test) {
 
 	bool toggle = true;
-	for (const auto& elem : imagePaths) {
+	if(train.size() == 0 && test.size() == 0)
+		for (const auto& elem : imagePaths) {
 
-		if (toggle == true) {
-			train.push_back(elem);
+			if (toggle == true) {
+				train.push_back(elem);
+			}
+			else
+				test.push_back(elem);
+			toggle = !toggle;
 		}
-		else
-			test.push_back(elem);
-		toggle = !toggle;
-	}
 
 	cout << "No. elements assigned to test: " << test.size() << endl;
 	cout << "No. elements assigned to train: " << train.size() << endl;
