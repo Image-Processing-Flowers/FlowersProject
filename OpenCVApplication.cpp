@@ -8,6 +8,7 @@
 #include <iostream>
 #include "stdafx.h"
 #include <array>
+#include "Tag.hpp"
 #ifdef _WIN32
 #include <windows.h>
 #else
@@ -98,10 +99,15 @@ void AssignTrainTest(vector<String> imagePaths, vector<String>& train, vector<St
 			test.push_back(elem);
 		toggle = !toggle;
 	}
+
+	cout << "No. elements assigned to test: " << test.size() << endl;
+	cout << "No. elements assigned to train: " << train.size() << endl;
 }
 
 void AreAllFilesOpened(const vector<String>& allFiles) {
-	if (allFiles.size() == 5000) 
+
+	cout << "Files opened: " << allFiles.size() << endl;
+	if (allFiles.size() == 5000)
 	{
 		cout << "The test was passed successfully!" << endl;
 	}
@@ -112,15 +118,80 @@ void AreAllFilesOpened(const vector<String>& allFiles) {
 	return;
 }
 
+void generateTestTags(vector<String>& test, map<String, int>& testMap) {
+
+	if (test.empty()) {
+		cout << "WARNING: Elements is empty. Firstly, assign elements to test." << endl;
+	}
+
+	for (const auto& elem : test) {
+
+		int randomTag = Tag::getRandomTag();
+		testMap.insert(pair<String, int>(elem, randomTag));
+	}
+
+	cout << "Test tags have been generated." << endl;
+}
+
+void tagsCorrectRangeTest(map<String, int> testMap) {
+
+	if (testMap.empty()) {
+		cout << "ERROR: Test tags aren't generated." << endl;
+	}
+
+	bool inRange = true;
+	for (const auto& elem : testMap) {
+		if (elem.second < 0 || elem.second > 4) {
+			inRange = false;
+			cout << "Element {" << elem.first << "}\n\tnot in range [0, 4], with wrong tag {" << elem.second << "}." << endl;
+		}
+
+	}
+	if (inRange) {
+		cout << "All elements have correct tags," << endl;
+	}
+}
+
+void calculateAccuracy(vector<String> test, map<String, int> flowersMap, map<String, int> testMap, float& accuracy) {
+	
+	if (test.empty()) {
+		cout << "WARNING: Elemtents for test are not assigned." << endl;
+	}
+	if (testMap.empty()) {
+		cout << "WARNING: Test tag are not generated." << endl;
+	}
+
+	int checks = 0;
+	for (const auto& elem : test) {
+		if (flowersMap[elem] == testMap[elem]) {
+			checks++;
+		}
+	}
+
+	accuracy = checks / (float)test.size() * 100.0f;
+
+}
+
 int main()
 {
-	vector<String> possibleOptions = { "Assign Test/Train","Run the tests","Exit" };
+	vector<String> possibleOptions = {
+		"Assign Test/Train",
+		"[TEST] Check number of files opened",
+		"Generate random tags for test",
+		"[TEST] Tags in correct range",
+		"Calculate accuracy",
+		"Exit"
+	};
 	int optionChosed = -1;
 
-	map<String, int> flowersMap;
 	vector<String> imagePaths;
 	vector<String> test;
 	vector<String> train;
+
+	map<String, int> flowersMap;
+	map<String, int> testMap;
+
+	float accuracy;
 
 	AssignPath();
 	OpenImagesBatch(imagePaths, flowersMap);
@@ -129,13 +200,14 @@ int main()
 	//user interface
 	while (1) {
 
-		cout << "List of options:" << endl;
+		cout << "LIST OF OPTIONS:" << endl << endl;
 		for (int i = 0; i < possibleOptions.size(); i++) {
 			cout << i << " - " << possibleOptions[i] << endl;
 		}
-		cout << "Choose from one of the options:";
+		cout << "\n<#> Choose from one of the options: ";
 
 		cin >> optionChosed;
+		cout << " ------------------ " << endl;
 
 		switch (optionChosed) {
 		case 0:
@@ -147,6 +219,18 @@ int main()
 			break;
 
 		case 2:
+			generateTestTags(test, testMap);
+			testMap[test[0]] = 7;
+			break;
+
+		case 3:
+			tagsCorrectRangeTest(testMap);
+			break;
+		case 4:
+			calculateAccuracy(test, flowersMap, testMap, accuracy);
+			cout << "Accuracy: " << accuracy << " % " << endl;
+			break;
+		case 5:
 			return 0;
 
 		default:
@@ -154,7 +238,9 @@ int main()
 			break;
 		}
 
-		cout << endl << endl << endl << endl;
+		cout << " ------------------\n " << endl;
+		system("pause");
+		system("cls");
 	}
 
 	return 0;
