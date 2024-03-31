@@ -8,7 +8,7 @@
 #include <iostream>
 #include "stdafx.h"
 #include <array>
-#include "Tag.hpp"
+#include "Tag.hpp"	
 #ifdef _WIN32
 #include <windows.h>
 #else
@@ -61,7 +61,7 @@ void openImagesBatch(vector<String>& imagePaths, map<String, int>& flowersMap) {
 	String folderPath = path;
 
 	// Array of flower folder names
-	// 0 - Lilly, 1 - Lotus, 2 - Orchid, 3 - Sunflower, 4 - Tulip
+	// 0 - Lily, 1 - Lotus, 2 - Orchid, 3 - Sunflower, 4 - Tulip
 	String flowerFolders[] = { "Lilly", "Lotus", "Orchid", "Sunflower", "Tulip" };
 	int i = 0;
 
@@ -90,7 +90,7 @@ void openImagesBatch(vector<String>& imagePaths, map<String, int>& flowersMap) {
 void assignTrainTest(vector<String> imagePaths, vector<String>& train, vector<String>& test) {
 
 	bool toggle = true;
-	if(train.size() == 0 && test.size() == 0)
+	if (train.size() == 0 && test.size() == 0)
 		for (const auto& elem : imagePaths) {
 
 			if (toggle == true) {
@@ -120,8 +120,9 @@ void areAllFilesOpened(const vector<String>& allFiles) {
 }
 
 // In the 'testMap' we generate a random number for every element in test
-void generateTestTags(vector<String>& test, map<String, int>& testMap) {
-
+void generateRandomTestTags(vector<String>& test, map<String, int>& testMap) {
+	//testmap.empty
+	testMap.clear();
 	// in case 'test' have no assigned elements
 	if (test.empty()) {
 		cout << "WARNING: Elements is empty. Firstly, assign elements to test." << endl;
@@ -133,6 +134,23 @@ void generateTestTags(vector<String>& test, map<String, int>& testMap) {
 
 		int randomTag = Tag::getRandomTag();
 		testMap.insert(pair<String, int>(elem, randomTag));
+	}
+
+	cout << "Test tags have been generated." << endl;
+}
+void generateColorV1TestTags(vector<String>& test, map<String, int>& testMap) {
+	//testmap.empty
+	testMap.clear();
+	// in case 'test' have no assigned elements
+	if (test.empty()) {
+		cout << "WARNING: Elements is empty. Firstly, assign elements to test." << endl;
+		return;
+	}
+
+	// generate tags
+	for (const auto& path : test) {
+		int colorTag = Tag::getColorV1Tag(path);
+		testMap.insert(pair<String, int>(path, colorTag));
 	}
 
 	cout << "Test tags have been generated." << endl;
@@ -164,7 +182,7 @@ void tagsCorrectRangeTest(map<String, int> testMap) {
 
 // Calculate the accuracy
 void calculateAccuracy(vector<String> test, map<String, int> flowersMap, map<String, int> testMap, float& accuracy) {
-	
+
 	// in case 'test' have no assigned elements
 	if (test.empty()) {
 		cout << "WARNING: Elemtents for 'test' are not assigned." << endl;
@@ -188,6 +206,59 @@ void calculateAccuracy(vector<String> test, map<String, int> flowersMap, map<Str
 	accuracy = checks / (float)test.size() * 100.0f;
 
 }
+void printPredictionMatrix(map<String, int> predictionMap, map<String, int> trueFlowerMap, vector<String> test) {
+
+	String flowerFolders[] = { "Lilly", "Lotus", "Orchid", "Sunflower", "Tulip" };
+	int mat[5][5] = { 0 };
+	auto itPred = predictionMap.begin();
+	for (const auto& elem : test) {
+		mat[itPred->second][trueFlowerMap[elem]]++;
+		++itPred;
+	}
+	// Set a fixed width for 4-digit numbers with additional padding
+	int width = 12; // Adjust this width as needed for aesthetics
+
+	// Top border
+	std::cout << " +";
+	for (int j = 0; j < 6; ++j) {
+		std::cout << std::setfill('-') << std::setw(width + 1) << "+";
+	}
+	std::cout << std::endl;
+	//Box with the info about rows and columns
+	std::cout << " |";
+	std::cout << std::setfill(' ') << std::setw(width) << "Predict\\True" << "|";
+	//Row with true flower tags
+	for (int i = 0; i < 5; i++) {
+		std::cout << std::setfill(' ') << std::setw(width) << flowerFolders[i] << "|";
+	}
+	std::cout << std::endl;
+	//Bottom border of first row
+	std::cout << " +";
+	for (int j = 0; j < 6; ++j) {
+		std::cout << std::setfill('-') << std::setw(width + 1) << "+";
+	}
+	std::cout << std::endl;
+
+	// Print the matrix with uniform column widths and borders
+	for (int i = 0; i < 5; ++i) {
+		std::cout << " |";
+		//Column with predicted flower tags
+		std::cout << std::setfill(' ') << std::setw(width) << flowerFolders[i] << "|";
+		for (int j = 0; j < 5; ++j) {
+			//Matrix values
+			std::cout << std::setfill(' ') << std::setw(width - 1) << mat[i][j] / 25.0 << "%|";
+		}
+		std::cout << std::endl;
+
+		// Print row border
+		std::cout << " +";
+		for (int j = 0; j < 6; ++j) {
+			std::cout << std::setfill('-') << std::setw(width + 1) << "+";
+		}
+		std::cout << std::endl;
+	}
+
+}
 
 int main()
 {
@@ -196,8 +267,10 @@ int main()
 		"Assign Test/Train",
 		"[TEST] Check number of files opened",
 		"Generate random tags for test",
+		"Generate color tags for test",
 		"[TEST] Tags in correct range",
 		"Calculate accuracy",
+		"Print prediction matrix",
 		"Exit"
 	};
 	int optionChosed = -1;
@@ -238,17 +311,26 @@ int main()
 			break;
 
 		case 2:
-			generateTestTags(test, testMap);
+			generateRandomTestTags(test, testMap);
 			break;
 
 		case 3:
+			generateColorV1TestTags(test, testMap);
+			break;
+
+		case 4:
 			tagsCorrectRangeTest(testMap);
 			break;
-		case 4:
+
+		case 5:
 			calculateAccuracy(test, flowersMap, testMap, accuracy);
 			cout << "Accuracy: " << accuracy << " % " << endl;
 			break;
-		case 5:
+
+		case 6:
+			printPredictionMatrix(testMap, flowersMap, test);
+			break;
+		case 7:
 			return 0;
 
 		default:
@@ -258,18 +340,18 @@ int main()
 
 		cout << " ------------------\n " << endl;
 
-		#ifdef _WIN32
-			// Windows-specific pause and clear
-			system("pause"); // Pause
-			system("cls");   // Clear screen
-		#else
-			// Portable pause for Unix-like systems
-			std::cout << "Press Enter to continue...";
-			std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-			std::cin.get();
+#ifdef _WIN32
+		// Windows-specific pause and clear
+		system("pause"); // Pause
+		system("cls");   // Clear screen
+#else
+		// Portable pause for Unix-like systems
+		std::cout << "Press Enter to continue...";
+		std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+		std::cin.get();
 		// Clear screen
 		system("clear");
-		#endif
+#endif
 	}
 
 	return 0;
