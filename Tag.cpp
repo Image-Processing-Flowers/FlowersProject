@@ -118,10 +118,6 @@ int Tag::getColorV1Tag(String imagePath) {
 		}
 	}
 
-	//lily
-	if (topThreeColors[0] == "WHITE")
-		return 0;
-
 	//sunflower
 	if (foundOrange == true && foundYellow == true)
 		return 3;
@@ -133,6 +129,9 @@ int Tag::getColorV1Tag(String imagePath) {
 	//tulip
 	if (foundWhite == true &&(foundOrange == true || foundRed == true || foundPink == true))
 		return 4;
+	//lily
+	if (topThreeColors[0] == "WHITE")
+		return 0;
 
 	//lotus
 	return 1;
