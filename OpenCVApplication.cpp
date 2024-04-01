@@ -121,7 +121,7 @@ void areAllFilesOpened(const vector<String>& allFiles) {
 
 // In the 'testMap' we generate a random number for every element in test
 void generateRandomTestTags(vector<String>& test, map<String, int>& testMap) {
-	//testmap.empty
+	//empty testmap
 	testMap.clear();
 	// in case 'test' have no assigned elements
 	if (test.empty()) {
@@ -139,7 +139,7 @@ void generateRandomTestTags(vector<String>& test, map<String, int>& testMap) {
 	cout << "Test tags have been generated." << endl;
 }
 void generateColorV1TestTags(vector<String>& test, map<String, int>& testMap) {
-	//testmap.empty
+	//empty testmap
 	testMap.clear();
 	// in case 'test' have no assigned elements
 	if (test.empty()) {
