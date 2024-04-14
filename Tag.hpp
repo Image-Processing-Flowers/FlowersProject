@@ -5,6 +5,8 @@
 #include <cstdlib>
 #include <random>
 #include <opencv2/opencv.hpp>
+#include <cmath> // For std::sqrt
+#include <limits> // For std::numeric_limits
 
 using namespace std;
 
@@ -17,7 +19,9 @@ public:
 
 	static int getColorRGBTag(string imagePath);
 
-	static void assignVariableRangeValues(map<string, int> flowersMap);
+	static int getColorRGBTag2(string imagePath, map<int, map<string, float>>& colorsByLabel);
+
+	static void assignVariableRangeValues(map<string, int> flowersMap, map<int, map<string, float>>&colorsByLabel);
 
 	static void assignColorsForImageByRGB(string imagePath, map<string,int>& colorFreq);
 };
