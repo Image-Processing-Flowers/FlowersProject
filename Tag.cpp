@@ -12,19 +12,46 @@ bool sortByVal(const std::pair<string, int>& a, const std::pair<string, int>& b)
 	return a.second > b.second;
 }
 
-int Tag::getColorV1Tag(String imagePath) {
+void Tag::assignVariableRangeValues(map<String, int> flowersMap) {
+	//map for collecting the number of pixels by color by label
+	//!!!!!!TODO pt SERJU: inlocuiste TOATA LOGICA RGB de aici cu HSV
+	//ADICA = SERJU CREAZA O FUNCTIE NOUA assignColorsForImageByRGB DAR PENTRU HSV si o apelezi aici
+	map<int, map<String, float>> colorsByLabel;
+	map<String, int> colorsFreq;
+	for (const auto& pair : flowersMap) {
+
+		const string& imagePath = pair.first;
+		int label = pair.second;
+
+		//aici schimbi cand ai cu assignColorsForImageByHSV
+		assignColorsForImageByRGB(imagePath, colorsFreq);
+		for (const auto& color : colorsFreq) {
+			colorsByLabel[label][color.first] += color.second;
+		}
+	}
+	for (int i = 0; i < 5; i++) {
+
+		for (const auto& color : colorsFreq) {
+			//compute the average number of pixels with an exact color
+			colorsByLabel[i][color.first] /= 500.0;
+			//asta trebuie sa stocati voi ce ii printat mai jos si sa faceti functie noua 
+			cout << color.first << ":" << colorsByLabel[i][color.first] << ", ";
+		}
+		cout << endl;
+	}
+}
+
+void Tag::assignColorsForImageByRGB(String imagePath, map<String, int>& colFreq) {
+
 	Mat image = imread(imagePath);
 	if (image.empty()) {
 		cout << "Could not read the image" << endl;
-		return 1;
+		return;
 	}
 
 	// Convert to RGB format
 	Mat data;
 	image.convertTo(data, CV_8UC3);
-
-	// Declare colorsFrequency map with Vec3bCompare as the comparator
-	std::map<string, int> colFreq;
 
 	// Access the matrix 
 	// Fast method for continuous memory allocation
@@ -65,20 +92,26 @@ int Tag::getColorV1Tag(String imagePath) {
 			}
 		}
 	}
+}
+
+int Tag::getColorRGBTag(String imagePath) {
+
+	map<String, int> colorFreq;
+
+	//find the number of appearences of a colors in a photo
+	assignColorsForImageByRGB(imagePath, colorFreq);
 
 	//numbers of most predominant colors
 	int K = 3;
 
 	// Copying the map to a vector of pairs
-	std::vector<std::pair<cv::String, int>> freqVec(colFreq.begin(), colFreq.end());
+	std::vector<std::pair<cv::String, int>> freqVec(colorFreq
+		.begin(), colorFreq.end());
 
 	// Sort the vector by the frequency (second element of the pair), in descending order
 	std::sort(freqVec.begin(), freqVec.end(), sortByVal);
 
-	// Printing the sorted values
-	/*for (int i = 0; i < K; i++) {
-		std::cout << freqVec[i].first<< "Frequency: " << freqVec[i].second << std::endl;
-	}*/
+
 	int limit = min(K, static_cast<int>(freqVec.size()));
 	array<std::string, 70> topThreeColors;
 
@@ -108,7 +141,7 @@ int Tag::getColorV1Tag(String imagePath) {
 		if (freqVec[i].first == "GREEN") {
 			foundGreen = true;
 		}
-		
+
 		if (freqVec[i].first == "PINK") {
 			foundPink = true;
 		}
@@ -127,7 +160,7 @@ int Tag::getColorV1Tag(String imagePath) {
 		return 2;
 
 	//tulip
-	if (foundWhite == true &&(foundOrange == true || foundRed == true || foundPink == true))
+	if (foundWhite == true && (foundOrange == true || foundRed == true || foundPink == true))
 		return 4;
 	//lily
 	if (topThreeColors[0] == "WHITE")
