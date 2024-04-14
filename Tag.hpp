@@ -15,7 +15,11 @@ public:
 	// Returns a number number between 0 and 4
 	static int getRandomTag();
 
-	static int getColorV1Tag(string imagePath);
+	static int getColorRGBTag(string imagePath);
+
+	static void assignVariableRangeValues(map<string, int> flowersMap);
+
+	static void assignColorsForImageByRGB(string imagePath, map<string,int>& colorFreq);
 };
 
 #endif

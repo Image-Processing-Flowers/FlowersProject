@@ -149,7 +149,7 @@ void generateColorV1TestTags(vector<String>& test, map<String, int>& testMap) {
 
 	// generate tags
 	for (const auto& path : test) {
-		int colorTag = Tag::getColorV1Tag(path);
+		int colorTag = Tag::getColorRGBTag(path);
 		testMap.insert(pair<String, int>(path, colorTag));
 	}
 
@@ -206,6 +206,10 @@ void calculateAccuracy(vector<String> test, map<String, int> flowersMap, map<Str
 	accuracy = checks / (float)test.size() * 100.0f;
 
 }
+void assignRangeValues(map<String, int> flowersMap) {
+	Tag::assignVariableRangeValues(flowersMap);
+}
+
 void printPredictionMatrix(map<String, int> predictionMap, map<String, int> trueFlowerMap, vector<String> test) {
 
 	String flowerFolders[] = { "Lilly", "Lotus", "Orchid", "Sunflower", "Tulip" };
@@ -271,6 +275,7 @@ int main()
 		"[TEST] Tags in correct range",
 		"Calculate accuracy",
 		"Print prediction matrix",
+		"Variable range values",
 		"Exit"
 	};
 	int optionChosed = -1;
@@ -330,7 +335,12 @@ int main()
 		case 6:
 			printPredictionMatrix(testMap, flowersMap, test);
 			break;
+
 		case 7:
+			assignRangeValues(flowersMap);
+			break;
+
+		case 8:
 			return 0;
 
 		default:
