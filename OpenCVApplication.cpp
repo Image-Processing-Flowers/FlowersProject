@@ -156,6 +156,24 @@ void generateColorV1TestTags(vector<String>& test, map<String, int>& testMap) {
 	cout << "Test tags have been generated." << endl;
 }
 
+void generateColorV2TestTags(vector<String>& test, map<String, int>& testMap, map<int, map<String, float>>& colorsByLabel) {
+	//empty testmap
+	testMap.clear();
+	// in case 'test' have no assigned elements
+	if (test.empty()) {
+		cout << "WARNING: Elements is empty. Firstly, assign elements to test." << endl;
+		return;
+	}
+
+	// generate tags
+	for (const auto& path : test) {
+		int colorTag = Tag::getColorRGBTag2(path, colorsByLabel);
+		testMap.insert(pair<String, int>(path, colorTag));
+	}
+
+	cout << "Test tags have been generated." << endl;
+}
+
 // Verify if the value(tag) from the 'testMap' is in range 0 to 4
 void tagsCorrectRangeTest(map<String, int> testMap) {
 
@@ -206,8 +224,29 @@ void calculateAccuracy(vector<String> test, map<String, int> flowersMap, map<Str
 	accuracy = checks / (float)test.size() * 100.0f;
 
 }
-void assignRangeValues(map<String, int> flowersMap) {
-	Tag::assignVariableRangeValues(flowersMap);
+void assignRangeValues(map<String, int> flowersMap, map<int, map<String, float>>& colorsByLabel) {
+	Tag::assignVariableRangeValues(flowersMap, colorsByLabel);
+}
+
+void printRangeValues(map<int, map<String, float>>& colorsByLabel) {
+	std::map<int, std::string> flowerNames = {
+		{0, "Lily"},
+		{1, "Lotus"},
+		{2, "Orchid"},
+		{3, "Sunflower"},
+		{4, "Tulip"}
+	};
+
+	for (const auto& labelPair : colorsByLabel) {
+		int label = labelPair.first;
+		const auto& colorsMap = labelPair.second;
+
+		// Using flower names instead of tag numbers
+		std::cout << "Flower " << flowerNames[label] << ":\n";
+		for (const auto& colorPair : colorsMap) {
+			std::cout << "  Color " << colorPair.first << ": " << colorPair.second << " average pixels\n";
+		}
+	}
 }
 
 void printPredictionMatrix(map<String, int> predictionMap, map<String, int> trueFlowerMap, vector<String> test) {
@@ -250,7 +289,7 @@ void printPredictionMatrix(map<String, int> predictionMap, map<String, int> true
 		std::cout << std::setfill(' ') << std::setw(width) << flowerFolders[i] << "|";
 		for (int j = 0; j < 5; ++j) {
 			//Matrix values
-			std::cout << std::setfill(' ') << std::setw(width - 1) << mat[i][j] / 25.0 << "%|";
+			std::cout << std::setfill(' ') << std::setw(width) << mat[i][j] << "|";
 		}
 		std::cout << std::endl;
 
@@ -276,6 +315,8 @@ int main()
 		"Calculate accuracy",
 		"Print prediction matrix",
 		"Variable range values",
+		"Print range values",
+		"Generate color tags for test v2",
 		"Exit"
 	};
 	int optionChosed = -1;
@@ -286,6 +327,8 @@ int main()
 
 	map<String, int> flowersMap;
 	map<String, int> testMap;
+
+	map<int, map<String, float>>colorsByLabel;
 
 	float accuracy;
 
@@ -337,10 +380,18 @@ int main()
 			break;
 
 		case 7:
-			assignRangeValues(flowersMap);
+			assignRangeValues(flowersMap, colorsByLabel);
 			break;
 
 		case 8:
+			printRangeValues(colorsByLabel);
+			break;
+
+		case 9:
+			generateColorV2TestTags(test, testMap, colorsByLabel);
+			break;
+
+		case 10:
 			return 0;
 
 		default:

@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "Tag.hpp"
 #include "common.h"
+#include <cmath> // For std::sqrt
+#include <limits> // For std::numeric_limits
 
 using namespace std;
 
@@ -12,11 +14,10 @@ bool sortByVal(const std::pair<string, int>& a, const std::pair<string, int>& b)
 	return a.second > b.second;
 }
 
-void Tag::assignVariableRangeValues(map<String, int> flowersMap) {
+void Tag::assignVariableRangeValues(map<String, int> flowersMap, map<int, map<string, float>> &colorsByLabel) {
 	//map for collecting the number of pixels by color by label
 	//!!!!!!TODO pt SERJU: inlocuiste TOATA LOGICA RGB de aici cu HSV
 	//ADICA = SERJU CREAZA O FUNCTIE NOUA assignColorsForImageByRGB DAR PENTRU HSV si o apelezi aici
-	map<int, map<String, float>> colorsByLabel;
 	map<String, int> colorsFreq;
 	for (const auto& pair : flowersMap) {
 
@@ -34,11 +35,9 @@ void Tag::assignVariableRangeValues(map<String, int> flowersMap) {
 		for (const auto& color : colorsFreq) {
 			//compute the average number of pixels with an exact color
 			colorsByLabel[i][color.first] /= 500.0;
-			//asta trebuie sa stocati voi ce ii printat mai jos si sa faceti functie noua 
-			cout << color.first << ":" << colorsByLabel[i][color.first] << ", ";
 		}
-		cout << endl;
 	}
+	cout << "Variable range values assigned" << endl;
 }
 
 void Tag::assignColorsForImageByRGB(String imagePath, map<String, int>& colFreq) {
@@ -168,4 +167,37 @@ int Tag::getColorRGBTag(String imagePath) {
 
 	//lotus
 	return 1;
+}
+
+int Tag::getColorRGBTag2(String imagePath, map<int, map<string, float>>& colorsByLabel) {
+
+	std::map<std::string, int> colorFreq;
+	assignColorsForImageByRGB(imagePath, colorFreq);
+
+	float minDistance = (std::numeric_limits<float>::max)();
+	int closestTag = -1;
+
+	for (const auto& labelPair : colorsByLabel) {
+		int label = labelPair.first;
+		const auto& tagColorMap = labelPair.second;
+
+		float distance = 0.0;
+		for (const auto& tagColorPair : tagColorMap) {
+			std::string color = tagColorPair.first;
+			float tagColorValue = tagColorPair.second;
+			int imageColorValue = colorFreq.count(color) > 0 ? colorFreq[color] : 0;
+
+			distance += std::pow(tagColorValue - imageColorValue, 2);
+		}
+
+		distance = std::sqrt(distance);
+		std::cout << "Label: " << label << " Distance: " << distance << std::endl;  // Debug output
+
+		if (distance < minDistance) {
+			minDistance = distance;
+			closestTag = label;
+		}
+	}
+
+	return closestTag;
 }
