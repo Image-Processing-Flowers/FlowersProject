@@ -14,30 +14,85 @@ bool sortByVal(const std::pair<string, int>& a, const std::pair<string, int>& b)
 	return a.second > b.second;
 }
 
-void Tag::assignVariableRangeValues(map<String, int> flowersMap, map<int, map<string, float>> &colorsByLabel) {
+void Tag::assignVariableRangeValues(vector<string> paths, map<String, int> flowersMap, map<int, map<string, float>>& colorsByLabel) {
+
 	//map for collecting the number of pixels by color by label
-	//!!!!!!TODO pt SERJU: inlocuiste TOATA LOGICA RGB de aici cu HSV
-	//ADICA = SERJU CREAZA O FUNCTIE NOUA assignColorsForImageByRGB DAR PENTRU HSV si o apelezi aici
+	vector<string> colors = { "RED", "WHITE", "PINK", "YELLOW", "GREEN", "ORANGE" };
 	map<String, int> colorsFreq;
-	for (const auto& pair : flowersMap) {
 
-		const string& imagePath = pair.first;
-		int label = pair.second;
+	for (const auto& path : paths) {
 
-		//aici schimbi cand ai cu assignColorsForImageByHSV
-		assignColorsForImageByRGB(imagePath, colorsFreq);
+		colorsFreq.clear();
+		assignColorsForImageByHSV(path, colorsFreq);
+
 		for (const auto& color : colorsFreq) {
-			colorsByLabel[label][color.first] += color.second;
+			colorsByLabel[flowersMap[path]][color.first] += color.second;
 		}
+
 	}
 	for (int i = 0; i < 5; i++) {
 
-		for (const auto& color : colorsFreq) {
+		for (const auto& color : colors) {
 			//compute the average number of pixels with an exact color
-			colorsByLabel[i][color.first] /= 500.0;
+			colorsByLabel[i][color] /= 500.0;
 		}
 	}
 	cout << "Variable range values assigned" << endl;
+}
+void Tag::assignColorsForImageByHSV(String imagePath, map<String, int>& colFreq) {
+
+	Mat image = imread(imagePath);
+	if (image.empty()) {
+		cout << "Could not read the image" << endl;
+		return;
+	}
+
+	// Convert BGR to HSV format
+	Mat hsvImage;
+	cvtColor(image, hsvImage, COLOR_BGR2HSV);
+
+	// Access the matrix
+	// Fast method for continuous memory allocation
+	if (hsvImage.isContinuous()) {
+		cv::Vec3b* pixels = hsvImage.ptr<cv::Vec3b>(); // Pointer to the first pixel
+		for (size_t i = 0; i < hsvImage.total(); i++) {
+			cv::Vec3b& pixel = pixels[i];
+			int H = pixel[0];
+			int S = pixel[1];
+			int V = pixel[2];
+
+			// Define color ranges in HSV
+			//RED (split into two ranges because of the Hue wrapping at 180)
+			if ((H >= 0 && H <= 10 || H >= 170 && H <= 179) && S >= 100 && V >= 100) {
+				colFreq["RED"] += 1;
+			}
+
+			//WHITE
+			if (S <= 25 && V >= 200) {
+				colFreq["WHITE"] += 1;
+			}
+
+			//YELLOW
+			if (H >= 20 && H <= 30 && S >= 100 && V >= 100) {
+				colFreq["YELLOW"] += 1;
+			}
+
+			//PINK
+			if (H >= 150 && H <= 169 && S >= 100 && V >= 100) {
+				colFreq["PINK"] += 1;
+			}
+
+			//ORANGE
+			if (H >= 11 && H <= 20 && S >= 100 && V >= 100) {
+				colFreq["ORANGE"] += 1;
+			}
+
+			//GREEN
+			if (H >= 50 && H <= 90 && S >= 100 && V >= 100) {
+				colFreq["GREEN"] += 1;
+			}
+		}
+	}
 }
 
 void Tag::assignColorsForImageByRGB(String imagePath, map<String, int>& colFreq) {
@@ -98,7 +153,7 @@ int Tag::getColorRGBTag(String imagePath) {
 	map<String, int> colorFreq;
 
 	//find the number of appearences of a colors in a photo
-	assignColorsForImageByRGB(imagePath, colorFreq);
+	assignColorsForImageByHSV(imagePath, colorFreq);
 
 	//numbers of most predominant colors
 	int K = 3;
@@ -169,29 +224,31 @@ int Tag::getColorRGBTag(String imagePath) {
 	return 1;
 }
 
-int Tag::getColorRGBTag2(String imagePath, map<int, map<string, float>>& colorsByLabel) {
+int Tag::getColorHSVTag(String imagePath, map<int, map<string, float>>& colorsByLabel) {
 
 	std::map<std::string, int> colorFreq;
-	assignColorsForImageByRGB(imagePath, colorFreq);
+	assignColorsForImageByHSV(imagePath, colorFreq);
 
 	float minDistance = (std::numeric_limits<float>::max)();
 	int closestTag = -1;
 
 	for (const auto& labelPair : colorsByLabel) {
+
 		int label = labelPair.first;
 		const auto& tagColorMap = labelPair.second;
 
 		float distance = 0.0;
-		for (const auto& tagColorPair : tagColorMap) {
-			std::string color = tagColorPair.first;
-			float tagColorValue = tagColorPair.second;
-			int imageColorValue = colorFreq.count(color) > 0 ? colorFreq[color] : 0;
 
-			distance += std::pow(tagColorValue - imageColorValue, 2);
+		for (const auto& tagColorPair : tagColorMap) {
+
+			string color = tagColorPair.first;
+			float tagColorValue = tagColorPair.second;
+			int imageColorValue = colorFreq[color];
+
+			distance += pow(tagColorValue - imageColorValue, 2);
 		}
 
-		distance = std::sqrt(distance);
-		std::cout << "Label: " << label << " Distance: " << distance << std::endl;  // Debug output
+		distance = sqrt(distance);
 
 		if (distance < minDistance) {
 			minDistance = distance;

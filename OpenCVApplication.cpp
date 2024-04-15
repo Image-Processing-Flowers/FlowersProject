@@ -167,7 +167,7 @@ void generateColorV2TestTags(vector<String>& test, map<String, int>& testMap, ma
 
 	// generate tags
 	for (const auto& path : test) {
-		int colorTag = Tag::getColorRGBTag2(path, colorsByLabel);
+		int colorTag = Tag::getColorHSVTag(path, colorsByLabel);
 		testMap.insert(pair<String, int>(path, colorTag));
 	}
 
@@ -224,8 +224,8 @@ void calculateAccuracy(vector<String> test, map<String, int> flowersMap, map<Str
 	accuracy = checks / (float)test.size() * 100.0f;
 
 }
-void assignRangeValues(map<String, int> flowersMap, map<int, map<String, float>>& colorsByLabel) {
-	Tag::assignVariableRangeValues(flowersMap, colorsByLabel);
+void assignRangeValues(vector<string> train, map<String, int> flowersMap, map<int, map<String, float>>& colorsByLabel) {
+	Tag::assignVariableRangeValues(train, flowersMap, colorsByLabel);
 }
 
 void printRangeValues(map<int, map<String, float>>& colorsByLabel) {
@@ -322,7 +322,7 @@ int main()
 	int optionChosed = -1;
 
 	vector<String> imagePaths;
-	vector<String> test;
+	vector<string> test;
 	vector<String> train;
 
 	map<String, int> flowersMap;
@@ -380,7 +380,7 @@ int main()
 			break;
 
 		case 7:
-			assignRangeValues(flowersMap, colorsByLabel);
+			assignRangeValues(train, flowersMap, colorsByLabel);
 			break;
 
 		case 8:
