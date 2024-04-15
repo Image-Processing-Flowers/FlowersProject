@@ -19,11 +19,13 @@ public:
 
 	static int getColorRGBTag(string imagePath);
 
-	static int getColorRGBTag2(string imagePath, map<int, map<string, float>>& colorsByLabel);
+	static int getColorHSVTag(string imagePath, map<int, map<string, float>>& colorsByLabel);
 
-	static void assignVariableRangeValues(map<string, int> flowersMap, map<int, map<string, float>>&colorsByLabel);
+	static void assignVariableRangeValues(vector<string> paths, map<string, int> flowersMap, map<int, map<string, float>>&colorsByLabel);
 
 	static void assignColorsForImageByRGB(string imagePath, map<string,int>& colorFreq);
+
+	static void assignColorsForImageByHSV(string imagePath, map<string, int>& colorFreq);
 };
 
 #endif
