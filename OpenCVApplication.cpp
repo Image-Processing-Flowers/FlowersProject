@@ -1,8 +1,11 @@
 // OpenCVApplication.cpp : Defines the entry point for the console application.
 //
 //
+#define _HAS_STD_BYTE 0
+#include <cstddef> 
 #include "stdafx.h"
 #include "common.h"
+#include <filesystem>
 #include <opencv2/core/utils/logger.hpp>
 #include <string>
 #include <iostream>
@@ -15,6 +18,7 @@
 #include <unistd.h>
 #endif
 
+namespace fs = filesystem;
 using namespace std;
 
 String path = "Not initialized!";
@@ -198,7 +202,27 @@ void tagsCorrectRangeTest(map<String, int> testMap) {
 	}
 }
 
-// Calculate the accuracy
+void emptyFolder(const fs::path& dirPath) {
+	try {
+		// Check if the path exists and is a directory
+		if (fs::exists(dirPath) && fs::is_directory(dirPath)) {
+			// Iterate through each item in the directory
+			for (const auto& entry : fs::directory_iterator(dirPath)) {
+				// Remove files and directories recursively
+				fs::remove_all(entry.path());
+			}
+			cout << "Folder has been emptied successfully." << endl;
+		}
+		else {
+			cout << "The specified path does not exist or is not a directory." << endl;
+		}
+	}
+	catch (const fs::filesystem_error& e) {
+		cerr << "Error: " << e.what() << endl;
+	}
+}
+
+// Calculate the accuracy and save the wrong labeled photos
 void calculateAccuracy(vector<String> test, map<String, int> flowersMap, map<String, int> testMap, float& accuracy) {
 
 	// in case 'test' have no assigned elements
@@ -213,23 +237,49 @@ void calculateAccuracy(vector<String> test, map<String, int> flowersMap, map<Str
 
 	// increment the 'checks' if the value from 'testMap' match the value from 'flowersMap' for every element from 'test'
 	int checks = 0;
+	string wrong_path = path + "\\WrongImages";
 	for (const auto& elem : test) {
 		if (flowersMap[elem] == testMap[elem]) {
 			checks++;
+		}
+		else {
+			//save the photos that were not labeled correctly
+			Mat image = cv::imread(elem);
+
+			fs::path originalPath(elem);
+			string filename = originalPath.filename().string();
+
+			// check if the image has been loaded properly
+			if (image.empty()) {
+				cerr << "Could not read the image: " << elem << endl;
+				return;
+			}
+
+			// specify the path where you want to save the image
+
+			// save the image to the specified path
+			// imwrite returns a bool indicating whether it was successful
+			bool isSaved = cv::imwrite(wrong_path + "\\" + filename, image);
+
+			if (!isSaved) {
+				cerr << "Failed to save the image to: " << wrong_path + "\\" + filename << endl;
+				return;
+			}
+
 		}
 	}
 
 	// divide the number of 'checks' by the total number of 'test'; 
 	// multiplied by 100 so the value can be read in procentage
 	accuracy = checks / (float)test.size() * 100.0f;
-
 }
+
 void assignRangeValues(vector<string> train, map<String, int> flowersMap, map<int, map<String, float>>& colorsByLabel) {
 	Tag::assignVariableRangeValues(train, flowersMap, colorsByLabel);
 }
 
 void printRangeValues(map<int, map<String, float>>& colorsByLabel) {
-	std::map<int, std::string> flowerNames = {
+	map<int, string> flowerNames = {
 		{0, "Lily"},
 		{1, "Lotus"},
 		{2, "Orchid"},
@@ -242,9 +292,9 @@ void printRangeValues(map<int, map<String, float>>& colorsByLabel) {
 		const auto& colorsMap = labelPair.second;
 
 		// Using flower names instead of tag numbers
-		std::cout << "Flower " << flowerNames[label] << ":\n";
+		cout << "Flower " << flowerNames[label] << ":\n";
 		for (const auto& colorPair : colorsMap) {
-			std::cout << "  Color " << colorPair.first << ": " << colorPair.second << " average pixels\n";
+			cout << "  Color " << colorPair.first << ": " << colorPair.second << " average pixels\n";
 		}
 	}
 }
@@ -262,43 +312,43 @@ void printPredictionMatrix(map<String, int> predictionMap, map<String, int> true
 	int width = 12; // Adjust this width as needed for aesthetics
 
 	// Top border
-	std::cout << " +";
+	cout << " +";
 	for (int j = 0; j < 6; ++j) {
-		std::cout << std::setfill('-') << std::setw(width + 1) << "+";
+		cout << setfill('-') << setw(width + 1) << "+";
 	}
-	std::cout << std::endl;
+	cout << endl;
 	//Box with the info about rows and columns
-	std::cout << " |";
-	std::cout << std::setfill(' ') << std::setw(width) << "Predict\\True" << "|";
+	cout << " |";
+	cout << setfill(' ') << setw(width) << "Predict\\True" << "|";
 	//Row with true flower tags
 	for (int i = 0; i < 5; i++) {
-		std::cout << std::setfill(' ') << std::setw(width) << flowerFolders[i] << "|";
+		cout << setfill(' ') << setw(width) << flowerFolders[i] << "|";
 	}
-	std::cout << std::endl;
+	cout << endl;
 	//Bottom border of first row
-	std::cout << " +";
+	cout << " +";
 	for (int j = 0; j < 6; ++j) {
-		std::cout << std::setfill('-') << std::setw(width + 1) << "+";
+		cout << setfill('-') << setw(width + 1) << "+";
 	}
-	std::cout << std::endl;
+	cout << endl;
 
 	// Print the matrix with uniform column widths and borders
 	for (int i = 0; i < 5; ++i) {
-		std::cout << " |";
+		cout << " |";
 		//Column with predicted flower tags
-		std::cout << std::setfill(' ') << std::setw(width) << flowerFolders[i] << "|";
+		cout << setfill(' ') << setw(width) << flowerFolders[i] << "|";
 		for (int j = 0; j < 5; ++j) {
 			//Matrix values
-			std::cout << std::setfill(' ') << std::setw(width) << mat[i][j] << "|";
+			cout << setfill(' ') << setw(width) << mat[i][j] << "|";
 		}
-		std::cout << std::endl;
+		cout << endl;
 
 		// Print row border
-		std::cout << " +";
+		cout << " +";
 		for (int j = 0; j < 6; ++j) {
-			std::cout << std::setfill('-') << std::setw(width + 1) << "+";
+			cout << setfill('-') << setw(width + 1) << "+";
 		}
-		std::cout << std::endl;
+		cout << endl;
 	}
 
 }
@@ -334,6 +384,8 @@ int main()
 
 	assignPath();
 	openImagesBatch(imagePaths, flowersMap);
+	string wrongPath = path + "\\WrongImages";
+	emptyFolder(wrongPath);
 
 	//logic for executing the chosen option
 	//user interface
@@ -407,9 +459,9 @@ int main()
 		system("cls");   // Clear screen
 #else
 		// Portable pause for Unix-like systems
-		std::cout << "Press Enter to continue...";
-		std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-		std::cin.get();
+		cout << "Press Enter to continue...";
+		cin.ignore(numeric_limits<streamsize>::max(), '\n');
+		cin.get();
 		// Clear screen
 		system("clear");
 #endif
