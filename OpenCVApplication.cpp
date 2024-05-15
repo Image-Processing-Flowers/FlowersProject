@@ -299,6 +299,82 @@ void printRangeValues(map<int, map<String, float>>& colorsByLabel) {
 	}
 }
 
+// apply a laplace filter and find the geometrical characteristics of the image
+void applyFilter(String imagePath) {
+
+	Mat gray = imread(imagePath, 0);
+
+	// Apply Laplacian filter
+	Mat laplacian;
+	Laplacian(gray, laplacian, CV_16S, 3);
+	convertScaleAbs(laplacian, laplacian);
+
+	cv::Mat binary;
+	cv::threshold(laplacian, binary, 128, 255, cv::THRESH_BINARY);
+
+	// Find contours
+	std::vector<std::vector<cv::Point>> contours;
+	std::vector<cv::Vec4i> hierarchy;
+	cv::findContours(binary, contours, hierarchy, cv::RETR_TREE, cv::CHAIN_APPROX_SIMPLE);
+	double totalArea = 0;
+	double totalPerimeter = 0;
+	double totalBoundingBoxWidth = 0;
+	double totalBoundingBoxHeight = 0;
+	double totalAspectRatio = 0;
+	double totalEnclosingCircleRadius = 0;
+
+	// Analyze contours
+	for (size_t i = 0; i < contours.size(); i++) {
+		// Calculate area
+		double area = cv::contourArea(contours[i]);
+		totalArea += area;
+
+		// Calculate perimeter
+		double perimeter = cv::arcLength(contours[i], true);
+		totalPerimeter += perimeter;
+
+		// Get bounding box
+		cv::Rect boundingBox = cv::boundingRect(contours[i]);
+		totalBoundingBoxWidth += boundingBox.width;
+		totalBoundingBoxHeight += boundingBox.height;
+
+		// Calculate aspect ratio
+		double aspectRatio = (double)boundingBox.width / boundingBox.height;
+		totalAspectRatio += aspectRatio;
+
+		// Get minimum enclosing circle
+		cv::Point2f center;
+		float radius;
+		cv::minEnclosingCircle(contours[i], center, radius);
+		totalEnclosingCircleRadius += radius;
+	}
+
+	// Calculate average characteristics
+	size_t numContours = contours.size();
+	double averageArea = totalArea / numContours;
+	double averagePerimeter = totalPerimeter / numContours;
+	double averageBoundingBoxWidth = totalBoundingBoxWidth / numContours;
+	double averageBoundingBoxHeight = totalBoundingBoxHeight / numContours;
+	double averageAspectRatio = totalAspectRatio / numContours;
+	double averageEnclosingCircleRadius = totalEnclosingCircleRadius / numContours;
+
+	// Print the average characteristics
+	std::cout << "Average Geometric Characteristics:" << std::endl;
+	std::cout << "Average Area: " << averageArea << std::endl;
+	std::cout << "Average Perimeter: " << averagePerimeter << std::endl;
+	std::cout << "Average Bounding Box Width: " << averageBoundingBoxWidth << std::endl;
+	std::cout << "Average Bounding Box Height: " << averageBoundingBoxHeight << std::endl;
+	std::cout << "Average Aspect Ratio: " << averageAspectRatio << std::endl;
+	std::cout << "Average Enclosing Circle Radius: " << averageEnclosingCircleRadius << std::endl;
+
+
+	// Show the original and filtered images
+	imshow("Original Image", gray);
+	imshow("Laplacian Filtered Image", laplacian);
+
+	cv::waitKey(0);
+	return;
+}
 void printPredictionMatrix(map<String, int> predictionMap, map<String, int> trueFlowerMap, vector<String> test) {
 
 	String flowerFolders[] = { "Lilly", "Lotus", "Orchid", "Sunflower", "Tulip" };
@@ -367,6 +443,7 @@ int main()
 		"Variable range values",
 		"Print range values",
 		"Generate color tags for test v2",
+		"Filter the image",
 		"Exit"
 	};
 	int optionChosed = -1;
@@ -389,6 +466,7 @@ int main()
 
 	//logic for executing the chosen option
 	//user interface
+
 	while (1) {
 
 		cout << "LIST OF OPTIONS:" << endl << endl;
@@ -442,9 +520,14 @@ int main()
 		case 9:
 			generateColorV2TestTags(test, testMap, colorsByLabel);
 			break;
-
+		
 		case 10:
+			applyFilter("C:\\Users\\DELL\\Desktop\\skull\\3\\PI\\project\\flower_images\\Lilly\\001ff6656j.jpg");
+			break;
+
+		case 11:
 			return 0;
+
 
 		default:
 			cout << "Invalid option" << endl;
