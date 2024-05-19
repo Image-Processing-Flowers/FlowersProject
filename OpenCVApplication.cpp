@@ -299,82 +299,6 @@ void printRangeValues(map<int, map<String, float>>& colorsByLabel) {
 	}
 }
 
-// apply a laplace filter and find the geometrical characteristics of the image
-void applyFilter(String imagePath) {
-
-	Mat gray = imread(imagePath, 0);
-
-	// Apply Laplacian filter
-	Mat laplacian;
-	Laplacian(gray, laplacian, CV_16S, 3);
-	convertScaleAbs(laplacian, laplacian);
-
-	cv::Mat binary;
-	cv::threshold(laplacian, binary, 128, 255, cv::THRESH_BINARY);
-
-	// Find contours
-	std::vector<std::vector<cv::Point>> contours;
-	std::vector<cv::Vec4i> hierarchy;
-	cv::findContours(binary, contours, hierarchy, cv::RETR_TREE, cv::CHAIN_APPROX_SIMPLE);
-	double totalArea = 0;
-	double totalPerimeter = 0;
-	double totalBoundingBoxWidth = 0;
-	double totalBoundingBoxHeight = 0;
-	double totalAspectRatio = 0;
-	double totalEnclosingCircleRadius = 0;
-
-	// Analyze contours
-	for (size_t i = 0; i < contours.size(); i++) {
-		// Calculate area
-		double area = cv::contourArea(contours[i]);
-		totalArea += area;
-
-		// Calculate perimeter
-		double perimeter = cv::arcLength(contours[i], true);
-		totalPerimeter += perimeter;
-
-		// Get bounding box
-		cv::Rect boundingBox = cv::boundingRect(contours[i]);
-		totalBoundingBoxWidth += boundingBox.width;
-		totalBoundingBoxHeight += boundingBox.height;
-
-		// Calculate aspect ratio
-		double aspectRatio = (double)boundingBox.width / boundingBox.height;
-		totalAspectRatio += aspectRatio;
-
-		// Get minimum enclosing circle
-		cv::Point2f center;
-		float radius;
-		cv::minEnclosingCircle(contours[i], center, radius);
-		totalEnclosingCircleRadius += radius;
-	}
-
-	// Calculate average characteristics
-	size_t numContours = contours.size();
-	double averageArea = totalArea / numContours;
-	double averagePerimeter = totalPerimeter / numContours;
-	double averageBoundingBoxWidth = totalBoundingBoxWidth / numContours;
-	double averageBoundingBoxHeight = totalBoundingBoxHeight / numContours;
-	double averageAspectRatio = totalAspectRatio / numContours;
-	double averageEnclosingCircleRadius = totalEnclosingCircleRadius / numContours;
-
-	// Print the average characteristics
-	std::cout << "Average Geometric Characteristics:" << std::endl;
-	std::cout << "Average Area: " << averageArea << std::endl;
-	std::cout << "Average Perimeter: " << averagePerimeter << std::endl;
-	std::cout << "Average Bounding Box Width: " << averageBoundingBoxWidth << std::endl;
-	std::cout << "Average Bounding Box Height: " << averageBoundingBoxHeight << std::endl;
-	std::cout << "Average Aspect Ratio: " << averageAspectRatio << std::endl;
-	std::cout << "Average Enclosing Circle Radius: " << averageEnclosingCircleRadius << std::endl;
-
-
-	// Show the original and filtered images
-	imshow("Original Image", gray);
-	imshow("Laplacian Filtered Image", laplacian);
-
-	cv::waitKey(0);
-	return;
-}
 void printPredictionMatrix(map<String, int> predictionMap, map<String, int> trueFlowerMap, vector<String> test) {
 
 	String flowerFolders[] = { "Lilly", "Lotus", "Orchid", "Sunflower", "Tulip" };
@@ -431,7 +355,7 @@ void printPredictionMatrix(map<String, int> predictionMap, map<String, int> true
 
 int main()
 {
-	srand(time(0));	// init for random
+	srand(time(0)); // init for random
 	vector<String> possibleOptions = {
 		"Assign Test/Train",
 		"[TEST] Check number of files opened",
@@ -443,7 +367,8 @@ int main()
 		"Variable range values",
 		"Print range values",
 		"Generate color tags for test v2",
-		"Filter the image",
+		"Apply filter and calculate geometric characteristics",
+		"Generate geometric tags for test",
 		"Exit"
 	};
 	int optionChosed = -1;
@@ -455,7 +380,7 @@ int main()
 	map<String, int> flowersMap;
 	map<String, int> testMap;
 
-	map<int, map<String, float>>colorsByLabel;
+	map<int, map<String, float>> colorsByLabel;
 
 	float accuracy;
 
@@ -464,11 +389,9 @@ int main()
 	string wrongPath = path + "\\WrongImages";
 	emptyFolder(wrongPath);
 
-	//logic for executing the chosen option
-	//user interface
+	GeometricCharacteristics** characteristics = nullptr;
 
 	while (1) {
-
 		cout << "LIST OF OPTIONS:" << endl << endl;
 		for (int i = 0; i < possibleOptions.size(); i++) {
 			cout << i << " - " << possibleOptions[i] << endl;
@@ -478,57 +401,64 @@ int main()
 		cin >> optionChosed;
 		cout << " ------------------ " << endl;
 
-		// start of options selecion
 		switch (optionChosed) {
 		case 0:
 			assignTrainTest(imagePaths, train, test);
 			break;
-
 		case 1:
 			areAllFilesOpened(imagePaths);
 			break;
-
 		case 2:
 			generateRandomTestTags(test, testMap);
 			break;
-
 		case 3:
 			generateColorV1TestTags(test, testMap);
 			break;
-
 		case 4:
 			tagsCorrectRangeTest(testMap);
 			break;
-
 		case 5:
 			calculateAccuracy(test, flowersMap, testMap, accuracy);
 			cout << "Accuracy: " << accuracy << " % " << endl;
 			break;
-
 		case 6:
 			printPredictionMatrix(testMap, flowersMap, test);
 			break;
-
 		case 7:
 			assignRangeValues(train, flowersMap, colorsByLabel);
 			break;
-
 		case 8:
 			printRangeValues(colorsByLabel);
 			break;
-
 		case 9:
 			generateColorV2TestTags(test, testMap, colorsByLabel);
 			break;
-		
 		case 10:
-			applyFilter("C:\\Users\\DELL\\Desktop\\skull\\3\\PI\\project\\flower_images\\Lilly\\001ff6656j.jpg");
+			characteristics = Tag::applyFilter(train, flowersMap);
+			for (int i = 0; i < 5; ++i) {
+				cout << "Tag " << i << " Geometric Characteristics:" << endl;
+				cout << "  Average Area: " << characteristics[i]->averageArea << endl;
+				cout << "  Average Perimeter: " << characteristics[i]->averagePerimeter << endl;
+				cout << "  Average Bounding Box Width: " << characteristics[i]->averageBoundingBoxWidth << endl;
+				cout << "  Average Bounding Box Height: " << characteristics[i]->averageBoundingBoxHeight << endl;
+				cout << "  Average Aspect Ratio: " << characteristics[i]->averageAspectRatio << endl;
+				cout << "  Average Enclosing Circle Radius: " << characteristics[i]->averageEnclosingCircleRadius << endl;
+			}
 			break;
-
 		case 11:
+			if (characteristics == nullptr) {
+				cout << "You need to calculate the geometric characteristics first (option 10)." << endl;
+			}
+			else {
+				for (const auto& imagePath : test) {
+					int tag = Tag::getGeometricTag(imagePath, characteristics);
+					testMap[imagePath] = tag;
+				}
+				cout << "Geometric tags for test set generated." << endl;
+			}
+			break;
+		case 12:
 			return 0;
-
-
 		default:
 			cout << "Invalid option" << endl;
 			break;
@@ -537,17 +467,21 @@ int main()
 		cout << " ------------------\n " << endl;
 
 #ifdef _WIN32
-		// Windows-specific pause and clear
 		system("pause"); // Pause
 		system("cls");   // Clear screen
 #else
-		// Portable pause for Unix-like systems
 		cout << "Press Enter to continue...";
 		cin.ignore(numeric_limits<streamsize>::max(), '\n');
 		cin.get();
-		// Clear screen
 		system("clear");
 #endif
+	}
+
+	if (characteristics != nullptr) {
+		for (int i = 0; i < 5; ++i) {
+			delete characteristics[i];
+		}
+		delete[] characteristics;
 	}
 
 	return 0;

@@ -8,10 +8,20 @@
 #include <cmath> // For std::sqrt
 #include <limits> // For std::numeric_limits
 
+typedef struct {
+	double averageArea;
+	double averagePerimeter;
+	double averageBoundingBoxWidth;
+	double averageBoundingBoxHeight;
+	double averageAspectRatio;
+	double averageEnclosingCircleRadius;
+} GeometricCharacteristics;
+
 using namespace std;
 
 class Tag
 {
+
 public:
 
 	// Returns a number number between 0 and 4
@@ -26,6 +36,13 @@ public:
 	static void assignColorsForImageByRGB(string imagePath, map<string,int>& colorFreq);
 
 	static void assignColorsForImageByHSV(string imagePath, map<string, int>& colorFreq);
+
+	static GeometricCharacteristics** applyFilter(vector<string> train, map<string, int> flowersMap);
+
+	static GeometricCharacteristics calculateGeometricCharacteristics(const string &imagePath);
+
+	static int getGeometricTag(const string& imagePath, GeometricCharacteristics** characteristics);
+
 };
 
 #endif
