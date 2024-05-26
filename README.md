@@ -18,9 +18,19 @@
    3. [Tag.cpp](#tagcpp)
 7. [Conclusions](#conclusions)
 
+
 ## Introduction
 
-&nbsp; &nbsp;&nbsp; &nbsp;This project aims to correctly classify the photos of the dataset: https://www.kaggle.com/datasets/kausthubkannan/5-flower-types-classification-dataset, using OpenCV for image processing. The dataset contains 5 types of flowers, each of them having 1000 photos. The included flower classes are: Sunflower, Tulip, Orchid, Lily, and Lotus.
+&nbsp; &nbsp;&nbsp; &nbsp;This project aims to correctly classify the photos of the dataset: [5 Flower Types Classification Dataset](https://www.kaggle.com/datasets/kausthubkannan/5-flower-types-classification-dataset), using OpenCV for image processing. The dataset contains 5 types of flowers, each having 1000 photos. The included flower classes are: Sunflower, Tulip, Orchid, Lily, and Lotus.\
+
+&nbsp; &nbsp;&nbsp; &nbsp;OpenCV (Open Source Computer Vision Library) is an open-source computer vision and machine learning software library. OpenCV was built to provide a common infrastructure for computer vision applications and to accelerate the use of machine perception in commercial products. Being a BSD-licensed product, OpenCV makes it easy for businesses to utilize and modify the code. The library contains more than 2500 optimized algorithms, which can be used for a variety of tasks including facial recognition, object identification, and in this case, flower classification.\
+
+&nbsp; &nbsp;&nbsp; &nbsp;OpenCV's robust image processing capabilities make it ideal for this project. It provides tools to read and write images, transform them, and perform complex operations on them with ease. The library supports a range of image processing operations such as filtering, edge detection, corner detection, and object tracking. Additionally, it offers machine learning algorithms to train and predict data, which is critical for the classification task at hand.
+
+&nbsp; &nbsp;&nbsp; &nbsp;In this project, OpenCV is used to preprocess the images and extract features that are essential for the classification algorithms. The preprocessing steps include resizing, color space conversion, and filtering to enhance the quality of the images and highlight important features. The classification methods leverage these processed images to accurately identify the type of flower in each photo.\
+
+&nbsp; &nbsp;&nbsp; &nbsp;The aim of this project is to develop a reliable and efficient classification system for the five types of flowers in the dataset. By harnessing the power of OpenCV's image processing functions, we can build a model that not only achieves high accuracy but also provides insights into the distinguishing features of each flower type.
+
 
 ## Project Overview
 
@@ -46,9 +56,9 @@
 &nbsp; &nbsp;&nbsp; &nbsp;The most common problem while trying to get the program to work is the double definition of a macro type. For this, we will need to add to the Project -> Properties -> C/C++ -> Preprocessor -> Preprocessor Definitions: **_HAS_STD_BYTE=0;_CRT_SECURE_NO_WARNINGS;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)**. Other than this, everything should work as intended if all the previous conditions are met.
 
 ## User Guide and Options Description
-&nbsp; &nbsp;&nbsp; &nbsp;For the program to work, the user needs to add its path to the flower images folder according to its PC name. Before running the actual method, we need to run the "Assign Test/Train" option first to split the set into training set and test set. The result printing methods: "Calculate accuracy", "Print prediction matrix" will not work unless a classification method is used.
-&nbsp; &nbsp;&nbsp; &nbsp; The "Generate random tags for test" is pretty straightforward, you don't need to choose any other option than this one to make it work. Instead, for the "Generate color tags for test", using RGB, and "Generate color tags for test v2", using HSV, you need to use the "Variable range values" option to assign the average characteristics of each type of flower. You can see these values by running the "Print range values" option. The methods used to generate color tags measure the average frequency of the colors: red, white, green, orange, pink, and yellow. The RGB one is based on a decision tree and the v2 one is based on KNN.
-&nbsp; &nbsp;&nbsp; &nbsp;The "Generate geometric tags for test" option needs to first run option 10 to compute the average geometric characteristics. This method is based on KNN too, but before computing the contours and the geometric analysis, we first apply a Laplace filter on each image.
+&nbsp; &nbsp;&nbsp; &nbsp;For the program to work, the user needs to add its path to the flower images folder according to its PC name. Before running the actual method, we need to run the "Assign Test/Train" option first to split the set into training set and test set. The result printing methods: "Calculate accuracy", "Print prediction matrix" will not work unless a classification method is used.\
+&nbsp; &nbsp;&nbsp; &nbsp; The "Generate random tags for test" is pretty straightforward, you don't need to choose any other option than this one to make it work. Instead, for the "Generate color tags for test", using RGB, and "Generate color tags for test v2", using HSV, you need to use the "Variable range values" option to assign the average characteristics of each type of flower. You can see these values by running the "Print range values" option. The methods used to generate color tags measure the average frequency of the colors: red, white, green, orange, pink, and yellow. The RGB one is based on a decision tree and the v2 one is based on KNN.\
+&nbsp; &nbsp;&nbsp; &nbsp;The "Generate geometric tags for test" option needs to first run option 10 to compute the average geometric characteristics. This method is based on KNN too, but before computing the contours and the geometric analysis, we first apply a Laplace filter on each image.\
 &nbsp; &nbsp;&nbsp; &nbsp;The options that begin with [TEST] are auxiliary methods used to test options responsible for the management of the files and the correct range prediction.
 
 ## Project Structure
