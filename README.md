@@ -67,6 +67,68 @@
 - Tag.cpp
 - Tag.hpp
 
+### Testing Results
+
+The testing results section provides an overview of the classification accuracy and detailed performance metrics for the different methods used in the flower recognition project. Below are the results of various classification methods applied to the dataset.
+
+#### 1. Accuracy Results
+
+The accuracy results for different methods used in this project are as follows:
+
+1. **HSV Tags**
+   - **Accuracy: 42.68%**
+   - This method uses a decision tree based on the HSV color frequency of the images. It gives us the best results in accuracy, and from this, we tried to improve but nothing succeeded. The high accuracy suggests that the HSV color space is effective in capturing the color variations necessary for distinguishing between different flower types.
+   - ![HSV Tags Accuracy](resultsimg/hsv.png)
+
+2. **Color Tags with KNN**
+   - **Accuracy: 32.12%**
+   - This method employs the KNN algorithm using HSV color space. Despite using a different color space that better represents human color perception, the accuracy remains lower than the HSV decision tree. This suggests that additional features or more complex models might be needed for better performance. It highlights the challenge of distinguishing flowers based on color similarity and the need for incorporating other distinguishing features.
+   - ![Color Tags with KNN](resultsimg/hsv2.png)
+
+3. **Random Tags**
+   - **Accuracy: 20.6%**
+   - This method randomly assigns tags to the test set images, resulting in a relatively low accuracy. It serves as a baseline to compare the performance of other classification methods. The random assignment shows the difficulty of the classification task and sets a benchmark for more sophisticated algorithms.
+   - ![Random Tags](resultsimg/rnd.png)
+
+4. **Geometric Tags**
+   - **Accuracy: 21.64%**
+   - Using geometric characteristics such as area, perimeter, and bounding box dimensions, this method applies the KNN algorithm. The accuracy indicates that geometric features alone also do not provide sufficient differentiation among flower types. This method underscores the complexity of flower shapes and the need for combining multiple features to improve classification accuracy.
+   - ![Geometric Tags](resultsimg/geom.png)
+
+#### 2. Confusion Matrix
+
+The confusion matrix provides detailed insights into the performance of the classification methods by showing the number of correct and incorrect predictions for each class. Analyzing the confusion matrix helps identify specific areas where the model struggles, such as distinguishing between flowers with similar color distributions. The following image presents the confusion matrix for the model which gives us the best results.
+   - ![Confusion Matrix](resultsimg/pred_matr_hsv.png)
+
+#### 3. Geometric Characteristics
+
+The average geometric characteristics of the flowers for the geometric tags classification method are as follows:
+- ![Geometric Characteristics](resultsimg/knn_geom.png)
+- These characteristics provide an in-depth look at the shape and size metrics for each tag, helping to understand how geometric features vary among different flower types.
+
+#### 4. Color Frequency Analysis
+
+The average pixel values for different colors in each type of flower are as follows:
+- ![Color Frequency Analysis](resultsimg/knn_hsv.png)
+- The color frequency analysis highlights the dominant colors in each flower type. This analysis is critical for understanding how color features can be used for classification.
+
+These results highlight the strengths and weaknesses of different classification methods. By analyzing the confusion matrices and the average characteristics, we can identify areas for improvement and optimize our models further for better accuracy.
+
+### Conclusion
+
+The results from our flower classification project demonstrate the varying effectiveness of different methods in recognizing and classifying flower images. The HSV Tags method, which utilizes a decision tree based on HSV color frequency, achieved the highest accuracy at 42.68%. This indicates that the HSV color space is particularly effective in capturing the nuances of flower colors, making it a strong feature for classification tasks.
+
+In contrast, the Color Tags with KNN method, despite leveraging the same color space, achieved a lower accuracy of 32.12%. This suggests that while KNN is a powerful algorithm, it may require more refined or additional features to perform optimally in this context. The relatively low accuracy highlights the need for incorporating other distinguishing features beyond color.
+
+The Random Tags method, serving as a baseline, achieved an accuracy of 20.6%, underscoring the complexity of the classification task. This method randomly assigns tags, illustrating the challenges of flower classification and setting a benchmark for more sophisticated algorithms.
+
+The Geometric Tags method, which focuses on geometric characteristics such as area, perimeter, and bounding box dimensions, also achieved a relatively low accuracy of 21.64%. This indicates that geometric features alone are insufficient for accurate flower classification. The complexity of flower shapes requires the integration of multiple features to enhance classification accuracy.
+
+The confusion matrices and detailed analysis of geometric characteristics and color frequencies provide insights into where each method succeeds and fails. These insights guide future improvements, such as combining multiple features or exploring more advanced algorithms, to enhance the overall classification performance.
+
+In conclusion, while the HSV color space proved to be the most effective single feature, achieving robust flower classification likely requires a multifaceted approach that integrates various features and sophisticated models. Further research and experimentation with additional features and algorithms will be crucial for developing a more accurate and reliable flower classification system.
+
+
 ### OpenCVApplication.cpp
 &nbsp; &nbsp;&nbsp; &nbsp; Represents the file containing the main function and all the options for the user to run. It also contains all the print and file management functions.
 ### Tag.hpp
