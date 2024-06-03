@@ -23,6 +23,10 @@ using namespace std;
 
 String path = "Not initialized!";
 
+	// Array of flower folder names
+	// 0 - Lily, 1 - Lotus, 2 - Orchid, 3 - Sunflower, 4 - Tulip
+String flowerFolders[] = { "Lilly", "Lotus", "Orchid", "Sunflower", "Tulip" };
+
 String GetComputerName() {
 
 	array<char, MAX_COMPUTERNAME_LENGTH + 1> computerName{};
@@ -64,9 +68,6 @@ void openImagesBatch(vector<String>& imagePaths, map<String, int>& flowersMap) {
 	//this method opens the image batch, tags the types and returns all the path to all flower photos
 	String folderPath = path;
 
-	// Array of flower folder names
-	// 0 - Lily, 1 - Lotus, 2 - Orchid, 3 - Sunflower, 4 - Tulip
-	String flowerFolders[] = { "Lilly", "Lotus", "Orchid", "Sunflower", "Tulip" };
 	int i = 0;
 
 	for (const auto& flowerFolder : flowerFolders)
@@ -91,6 +92,7 @@ void openImagesBatch(vector<String>& imagePaths, map<String, int>& flowersMap) {
 
 
 }
+
 void assignTrainTest(vector<String> imagePaths, vector<String>& train, vector<String>& test) {
 
 	bool toggle = true;
@@ -142,6 +144,7 @@ void generateRandomTestTags(vector<String>& test, map<String, int>& testMap) {
 
 	cout << "Test tags have been generated." << endl;
 }
+
 void generateColorV1TestTags(vector<String>& test, map<String, int>& testMap) {
 	//empty testmap
 	testMap.clear();
@@ -224,7 +227,6 @@ void emptyFolder(const fs::path& dirPath) {
 
 // Calculate the accuracy and save the wrong labeled photos
 void calculateAccuracy(vector<String> test, map<String, int> flowersMap, map<String, int> testMap, float& accuracy) {
-
 	// in case 'test' have no assigned elements
 	if (test.empty()) {
 		cout << "WARNING: Elemtents for 'test' are not assigned." << endl;
@@ -238,39 +240,64 @@ void calculateAccuracy(vector<String> test, map<String, int> flowersMap, map<Str
 	// increment the 'checks' if the value from 'testMap' match the value from 'flowersMap' for every element from 'test'
 	int checks = 0;
 	string wrong_path = path + "\\WrongImages";
+	string correct_path = path + "\\CorrectImages";
+
+	// Create directories if they don't exist
+	if (!fs::exists(wrong_path)) {
+		fs::create_directories(wrong_path);
+	}
+	if (!fs::exists(correct_path)) {
+		fs::create_directories(correct_path);
+	}
+
 	for (const auto& elem : test) {
 		if (flowersMap[elem] == testMap[elem]) {
 			checks++;
-		}
-		else {
-			//save the photos that were not labeled correctly
+
+			// Save the photos that were labeled correctly
 			Mat image = cv::imread(elem);
 
 			fs::path originalPath(elem);
 			string filename = originalPath.filename().string();
 
-			// check if the image has been loaded properly
+			// Check if the image has been loaded properly
 			if (image.empty()) {
-				cerr << "Could not read the image: " << elem << endl;
-				return;
+				cout << "Could not read the image: " << elem << endl;
+				continue;
 			}
 
-			// specify the path where you want to save the image
+			bool isSavedCorrect = cv::imwrite(correct_path + "\\" + filename, image);
 
-			// save the image to the specified path
-			// imwrite returns a bool indicating whether it was successful
-			bool isSaved = cv::imwrite(wrong_path + "\\" + filename, image);
+			if (!isSavedCorrect) {
+				cout << "Failed to save the image to: " << correct_path + "\\" + filename << endl;
+				continue;
+			}
+		}
+		else {
+			// Save the photos that were NOT labeled correctly
+			Mat image = cv::imread(elem);
 
-			if (!isSaved) {
-				cerr << "Failed to save the image to: " << wrong_path + "\\" + filename << endl;
-				return;
+			fs::path originalPath(elem);
+			string filename = originalPath.filename().string();
+
+			// Check if the image has been loaded properly
+			if (image.empty()) {
+				cout << "Could not read the image: " << elem << endl;
+				continue;
 			}
 
+			// Save the image to the specified path
+			bool isSavedWrong = cv::imwrite(wrong_path + "\\" + filename, image);
+
+			if (!isSavedWrong) {
+				cout << "Failed to save the image to: " << wrong_path + "\\" + filename << endl;
+				continue;
+			}
 		}
 	}
 
-	// divide the number of 'checks' by the total number of 'test'; 
-	// multiplied by 100 so the value can be read in procentage
+	// Divide the number of 'checks' by the total number of 'test';
+	// multiplied by 100 so the value can be read in percentage
 	accuracy = checks / (float)test.size() * 100.0f;
 }
 
@@ -353,6 +380,104 @@ void printPredictionMatrix(map<String, int> predictionMap, map<String, int> true
 
 }
 
+void demoCorrectWrongRGB() {
+	String correct = path + "\\CorrectImages\\1eecf7a4c5.jpg";
+	String wrong = path + "\\WrongImages\\00f36a3c40.jpg";
+	map<int, map<string, float>> colorsByLabel;
+
+	// Information on image labeled correct
+	Mat correctImg = imread(correct);
+	if (correctImg.empty()) {
+		cout << "ERROR: Correct image not found! Ensure the path and file name are correct." << endl;
+		return;
+	}
+	resize(correctImg, correctImg, Size(400, 400));
+	imshow("Correct RGB", correctImg);
+
+	int correctTag = Tag::getColorRGBTag(correct);
+	cout << "\nPredicted: " << flowerFolders[correctTag] << " -> CORRECT (Sunflower)\n";
+	cout << "Correct image color frequencies:" << endl;
+
+	map<string, int> correctColorFreq;
+	Tag::assignColorsForImageByHSV(correct, correctColorFreq);
+	for (const auto& pair : correctColorFreq) {
+		cout << pair.first << ": " << pair.second << endl;
+	}
+
+	// Information on image labeled wrong
+	Mat wrongImg = imread(wrong);
+	if (wrongImg.empty()) {
+		cout << "ERROR: Wrong image not found! Ensure the path and file name are correct." << endl;
+		return;
+	}
+	resize(wrongImg, wrongImg, Size(400, 400));
+	imshow("Wrong RGB", wrongImg);
+
+	int wrongTag = Tag::getColorRGBTag(wrong);
+	cout << "\nPredicted: " << flowerFolders[wrongTag] << " -> WRONG (Lily) \n";
+	cout << "Wrong image color frequencies:" << endl;
+
+	map<string, int> wrongColorFreq;
+	Tag::assignColorsForImageByHSV(wrong, wrongColorFreq);
+	for (const auto& pair : wrongColorFreq) {
+		cout << pair.first << ": " << pair.second << endl;
+	}
+
+	waitKey(0);
+}
+
+void demoCorrectWrongGeometric(GeometricCharacteristics** characteristics) {
+	String correct = path + "\\CorrectImages\\1a81e77515.jpg";
+	String wrong = path + "\\WrongImages\\0dfaf0300b.jpg";
+
+	// Information on image labeled correct
+	Mat correctImg = imread(correct);
+	if (correctImg.empty()) {
+		cout << "ERROR: Correct image not found! Ensure the path and file name are correct." << endl;
+		return;
+	}
+	resize(correctImg, correctImg, Size(400, 400));
+	imshow("Correct Geometric", correctImg);
+
+	int correctTag = Tag::getGeometricTag(correct, characteristics);
+	cout << "\nPredicted: " << "Sunflower" << " -> CORRECT (Sunflower)\n";
+	cout << "Correct image geometric characteristics:" << endl;
+
+	GeometricCharacteristics correctChar = Tag::calculateGeometricCharacteristics(correct);
+	cout << "  Average Area: " << correctChar.averageArea << endl;
+	cout << "  Average Perimeter: " << correctChar.averagePerimeter << endl;
+	cout << "  Average Bounding Box Width: " << correctChar.averageBoundingBoxWidth << endl;
+	cout << "  Average Bounding Box Height: " << correctChar.averageBoundingBoxHeight << endl;
+	cout << "  Average Aspect Ratio: " << correctChar.averageAspectRatio << endl;
+	cout << "  Average Enclosing Circle Radius: " << correctChar.averageEnclosingCircleRadius << endl;
+
+	// Information on image labeled wrong
+	Mat wrongImg = imread(wrong);
+	if (wrongImg.empty()) {
+		cout << "ERROR: Wrong image not found! Ensure the path and file name are correct." << endl;
+		return;
+	}
+	resize(wrongImg, wrongImg, Size(400, 400));
+	imshow("Wrong Geometric", wrongImg);
+
+	int wrongTag = Tag::getGeometricTag(wrong, characteristics);
+	cout << "\nPredicted: " << flowerFolders[wrongTag] << " -> WRONG (Lotus)\n";
+	cout << "Wrong image geometric characteristics:" << endl;
+
+	GeometricCharacteristics wrongChar = Tag::calculateGeometricCharacteristics(wrong);
+	cout << "  Average Area: " << wrongChar.averageArea << endl;
+	cout << "  Average Perimeter: " << wrongChar.averagePerimeter << endl;
+	cout << "  Average Bounding Box Width: " << wrongChar.averageBoundingBoxWidth << endl;
+	cout << "  Average Bounding Box Height: " << wrongChar.averageBoundingBoxHeight << endl;
+	cout << "  Average Aspect Ratio: " << wrongChar.averageAspectRatio << endl;
+	cout << "  Average Enclosing Circle Radius: " << wrongChar.averageEnclosingCircleRadius << endl;
+
+	waitKey(0);
+}
+
+
+
+
 int main()
 {
 	srand(time(0)); // init for random
@@ -369,6 +494,8 @@ int main()
 		"Generate color tags for test v2",
 		"Apply filter and calculate geometric characteristics",
 		"Generate geometric tags for test",
+		"Demo Correct/Wrong RGB",
+		"Demo Correct/Wrong Geometric",
 		"Exit"
 	};
 	int optionChosed = -1;
@@ -458,6 +585,12 @@ int main()
 			}
 			break;
 		case 12:
+			demoCorrectWrongRGB();
+			break;
+		case 13:
+			demoCorrectWrongGeometric(characteristics);
+			break;
+		case 14:
 			return 0;
 		default:
 			cout << "Invalid option" << endl;

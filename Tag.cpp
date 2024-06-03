@@ -160,7 +160,6 @@ int Tag::getGeometricTag(const string& imagePath, GeometricCharacteristics** cha
 	return closestTag;
 }
 
-
 void Tag::assignVariableRangeValues(vector<string> paths, map<String, int> flowersMap, map<int, map<string, float>>& colorsByLabel) {
 
 	//map for collecting the number of pixels by color by label
@@ -186,6 +185,7 @@ void Tag::assignVariableRangeValues(vector<string> paths, map<String, int> flowe
 	}
 	cout << "Variable range values assigned" << endl;
 }
+
 void Tag::assignColorsForImageByHSV(String imagePath, map<String, int>& colFreq) {
 
 	Mat image = imread(imagePath);
