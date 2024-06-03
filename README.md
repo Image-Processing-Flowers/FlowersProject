@@ -1,4 +1,5 @@
 
+
 # Flower Recognition Project 
 ## Table of Contents
 
@@ -17,6 +18,8 @@
    2. [Tag.hpp](#taghpp)
    3. [Tag.cpp](#tagcpp)
 7. [Conclusions](#conclusions)
+7. [Demonstration](#demonstration)
+
 
 
 ## Introduction
@@ -128,6 +131,29 @@ The confusion matrices and detailed analysis of geometric characteristics and co
 
 In conclusion, while the HSV color space proved to be the most effective single feature, achieving robust flower classification likely requires a multifaceted approach that integrates various features and sophisticated models. Further research and experimentation with additional features and algorithms will be crucial for developing a more accurate and reliable flower classification system.
 
+### Demonstration
+1.  **RGB Demonstration**:
+    - **`demoCorrectWrongRGB()`**
+    -   This function demonstrates the process of predicting flower types using RGB color features.
+    - To try this demonstration, follow this options order: 0, 3, 5
+        
+	 ![RGB Demo](resultsimg/rgb.png)
+	 
+The sunflower has a lot of yellow and orange colors, as indicated by the higher color frequency. Orchid image has a high frequency of pink, which is a common color associated with both Lilies and Orchids.
+    
+2.  **Geometric Characteristics Demonstration**:
+    - **`demoCorrectWrongGeometric()`**
+    -   This function demonstrates the process of predicting flower types using the geometric features.
+    - To try this demonstration, follow this options order: 0, 10, 11, 5
+    
+     ![Geometric Demo](resultsimg/geo.png)
+Here are some key differences that might have contributed to the correct classification of the sunflower and the misclassification of the lotus:
+
+**Aspect Ratio**: The sunflower has a more elongated shape (aspect ratio: 1.12569), while the lotus has a more rounded shape (aspect ratio: 1.1424). This difference in shape might have helped the model correctly identify the sunflower.
+ **Bounding Box Width and Height**: The sunflower has a smaller bounding box width and height compared to the lotus. This suggests that the sunflower's petals are more compact and tightly packed, whereas the lotus has more spread-out petals.
+ **Enclosing Circle Radius**: The sunflower has a smaller enclosing circle radius, indicating that its petals are more curved inwards, whereas the lotus has a larger radius, suggesting more outward-facing petals.
+
+The similarities between the lotus and tulip (e.g., both have rounded shapes and similar aspect ratios) might have led to the misclassification.
 
 ### OpenCVApplication.cpp
 &nbsp; &nbsp;&nbsp; &nbsp; Represents the file containing the main function and all the options for the user to run. It also contains all the print and file management functions.
